@@ -4,9 +4,9 @@
 ################################################################################
 
 PKG_NAME="inputstream.rtmp"
-PKG_VERSION="df64b9b"
+PKG_VERSION="6c1af46"
 PKG_LICENSE="GPL"
-PKG_SITE="http://www.kodi.tv"
+PKG_SITE="https://github.com/notspiff/inputstream.rtmp"
 PKG_URL="https://github.com/notspiff/inputstream.rtmp/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain kodi-platform rtmpdump"
 PKG_SECTION=""
