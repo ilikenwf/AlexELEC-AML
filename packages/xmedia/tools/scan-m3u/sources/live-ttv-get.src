@@ -9,6 +9,7 @@ M3U_DIR="/storage/ttv-m3u"
 ACE_M3U="$M3U_DIR/AceLive-TTV.m3u"
 ACE_DIR="/storage/.config/acestream"
 JSON_FILE="$ACE_DIR/ttv-m3u/acelive.json"
+JSON_FILE_GZ="$JSON_FILE.gz"
 LOGO_LIST="$ACE_DIR/ttv-logo.list"
 TMP_LIST="/tmp/tmp-acettv.list"
 
@@ -17,24 +18,25 @@ TMP_LIST="/tmp/tmp-acettv.list"
 [ -z "$CAT_ALLFON" ] && CAT_ALLFON="0"
 
 STAT_OLD=
-if [ -f "$JSON_FILE" ]; then
-  STAT_OLD=`stat $JSON_FILE | grep 'Modify:'`
+if [ -f "$JSON_FILE_GZ" ]; then
+  STAT_OLD=`stat $JSON_FILE_GZ | grep 'Modify:'`
 fi
 
 mkdir -p $ACE_DIR/ttv-m3u
-curl -s -R -z "$JSON_FILE" -o "$JSON_FILE" "http://super-pomoyka.us.to/trash/ttv-list/acelive.json"
+curl -s -R -z "$JSON_FILE_GZ" -o "$JSON_FILE_GZ" -H "Accept-Encoding: gzip" "http://super-pomoyka.us.to/trash/ttv-list/acelive.json"
 
-if [ ! -f "$JSON_FILE" ]; then
+if [ ! -f "$JSON_FILE_GZ" ]; then
   echo "Error! Could not load json-file."
   exit
 fi
 
-STAT_NEW=`stat $JSON_FILE | grep 'Modify:'`
+STAT_NEW=`stat $JSON_FILE_GZ | grep 'Modify:'`
 if [ "$STAT_OLD" == "$STAT_NEW" ]; then
   echo "Done! You already actual playlist."
   exit
 fi
 
+gunzip -c "$JSON_FILE_GZ" > "$JSON_FILE"
 /usr/bin/jq -r '.[] | .cat + " # " + .name + " # " + .fname' $JSON_FILE > $TMP_LIST
 
 [ "$CAT_SHOW" == 0 ] && sed "s|^Развлекательные.*||g" -i $TMP_LIST
