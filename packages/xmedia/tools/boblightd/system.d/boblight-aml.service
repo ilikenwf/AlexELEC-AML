@@ -1,0 +1,17 @@
+[Unit]
+Description=Boblight-AML service
+Before=boblightd.service
+After=graphical.target
+ConditionPathExists=/storage/.cache/services/boblightd.conf
+
+[Service]
+EnvironmentFile=/run/alexelec/boblight-aml.conf
+ExecStartPre=/usr/bin/boblightd-config
+ExecStart=/usr/bin/boblight-aml $AML_ARGS
+TimeoutStopSec=1
+Restart=always
+RestartSec=2
+StartLimitInterval=0
+
+[Install]
+WantedBy=kodi.target
