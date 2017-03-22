@@ -4,7 +4,7 @@
 ################################################################################
 
 PKG_NAME="core-info"
-PKG_VERSION="176cdcd"
+PKG_VERSION="58c9a2c"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
@@ -24,5 +24,5 @@ make_target() {
 
 makeinstall_target() {
   mkdir -p $INSTALL/usr/lib/libretro
-  cp dist/info/*.info $INSTALL/usr/lib/libretro/
+    cp dist/info/*.info $INSTALL/usr/lib/libretro/
 }
