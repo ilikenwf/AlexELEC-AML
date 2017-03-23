@@ -399,7 +399,7 @@ if [ "$1" = "release" -o "$1" = "mkimage" -o "$1" = "amlpkg" ]; then
     fi
 
     # copy device tree image if any
-    if [ -f "$TARGET_IMG/$IMAGE_NAME.dtb" ]; then
+    if [ -f "$TARGET_IMG/$IMAGE_NAME.dtb" -a "$PROJECT" = "S905" ]; then
       cp "$TARGET_IMG/$IMAGE_NAME.dtb" $AML_PKG_DIR/dtb.img
     fi
 
@@ -428,7 +428,7 @@ if [ "$1" = "release" -o "$1" = "mkimage" -o "$1" = "amlpkg" ]; then
     fi
 
     # copy device tree image if any
-    if [ -f "$AML_PKG_DIR/dtb.img" ]; then
+    if [ -f "$AML_PKG_DIR/dtb.img" -a "$PROJECT" = "S905" ]; then
       cp "$AML_PKG_DIR/dtb.img" .
     fi
 
