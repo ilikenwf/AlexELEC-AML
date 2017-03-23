@@ -98,7 +98,7 @@ trap cleanup SIGINT
   mcopy $TARGET_IMG/$IMAGE_NAME.system ::/SYSTEM
   mcopy $RELEASE_DIR/target/KERNEL.md5 "::/$KERNEL_NAME.md5"
   mcopy $RELEASE_DIR/target/SYSTEM.md5 ::/SYSTEM.md5
-  if [ -f $TARGET_IMG/$IMAGE_NAME.dtb ]; then
+  if [ -f $TARGET_IMG/$IMAGE_NAME.dtb -a "$PROJECT" = "S905" ]; then
     echo "image: copy dtb if exist to part1..."
     mcopy $TARGET_IMG/$IMAGE_NAME.dtb ::/dtb.img
   fi
