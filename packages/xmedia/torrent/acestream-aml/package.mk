@@ -28,7 +28,7 @@ makeinstall_target() {
   mkdir -p $INSTALL/usr/bin
     cp $PKG_DIR/scripts/* $INSTALL/usr/bin
   mkdir -p $INSTALL/usr/config/acestream
-    cp $PKG_DIR/config/* $INSTALL/usr/config/acestream
+    cp -R $PKG_DIR/config/* $INSTALL/usr/config/acestream
 }
 
 post_install() {
