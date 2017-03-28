@@ -4,7 +4,7 @@
 ################################################################################
 
 PKG_NAME="libretro-picodrive"
-PKG_VERSION="f0a3d0d"
+PKG_VERSION="f5de3ba"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="MAME"
