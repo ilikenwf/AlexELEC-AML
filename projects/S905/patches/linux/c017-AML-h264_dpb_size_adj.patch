@@ -1,0 +1,17 @@
+diff -Naurp linux-d785aef/drivers/amlogic/amports/vh264.c linux-d785aef-patch/drivers/amlogic/amports/vh264.c
+--- linux-d785aef/drivers/amlogic/amports/vh264.c	2017-03-29 07:57:32.000000000 +0300
++++ linux-d785aef-patch/drivers/amlogic/amports/vh264.c	2017-03-29 08:04:34.000000000 +0300
+@@ -2907,10 +2907,10 @@ static int __init amvdec_h264_driver_ini
+ 	if (get_cpu_type() >= MESON_CPU_MAJOR_ID_GXTVBB
+ 		&& (codec_mm_get_total_size() > 80 * SZ_1M)) {
+ 		amvdec_h264_profile.profile = "4k";
+-		dpb_size_adj = 0;
++		//dpb_size_adj = 0;
+ 	}
+-	if (get_cpu_type() <= MESON_CPU_MAJOR_ID_GXBB)
+-		dpb_size_adj = 0;
++	//if (get_cpu_type() <= MESON_CPU_MAJOR_ID_GXBB)
++	//	dpb_size_adj = 0;
+ 
+ 	vcodec_profile_register(&amvdec_h264_profile);
+ 	return 0;
