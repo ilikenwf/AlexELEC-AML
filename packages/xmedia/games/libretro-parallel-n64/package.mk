@@ -22,6 +22,10 @@ pre_configure_target() {
   strip_lto
 }
 
+pre_build_target() {
+  export GIT_VERSION=$PKG_VERSION
+}
+
 make_target() {
   case $PROJECT in
     S805)
