@@ -2,7 +2,7 @@
 
 # Alex@ELEC - Embedded Linux Entertainment Center
 
-Alex@ELEC runs [Kodi](http://kodi.tv) and [VDR] (http://www.tvdr.de), an award-winning open source (GPL)
+Alex@ELEC runs [Kodi](http://kodi.tv) and [VDR](http://www.tvdr.de), an award-winning open source (GPL)
 software media player and entertainment hub for digital media.
 
 **Features**
