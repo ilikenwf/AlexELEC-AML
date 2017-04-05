@@ -1,0 +1,1507 @@
+diff --git a/drivers/amlogic/amaudio2/amaudio2.c b/drivers/amlogic/amaudio2/amaudio2.c
+index 950a664..24e62d3 100644
+--- a/drivers/amlogic/amaudio2/amaudio2.c
++++ b/drivers/amlogic/amaudio2/amaudio2.c
+@@ -161,24 +161,34 @@ static struct amaudio_port_t amaudio_ports[] = {
+ 	},
+ };
+ 
+-static inline short clip16(int x)
++static inline int16_t clip16(int x)
+ {
+ 	if (x < -32768)
+ 		return -32768;
+ 	else if (x > 32767)
+ 		return 32767;
+ 
+-	return (short)x;
++	return (int16_t)x;
+ }
+ 
+-static inline int clip24(int x)
++static inline int32_t clip24(int x)
+ {
+ 	if (x < -8388608)
+ 		return -8388608;
+ 	else if (x > 8388607)
+ 		return 8388607;
+ 
+-	return x;
++	return (int32_t)x;
++}
++
++static inline int32_t clip32(long x)
++{
++	if (x < -2147483648)
++		return -2147483648;
++	else if (x > 2147483647)
++		return 2147483647;
++
++	return (int32_t)x;
+ }
+ 
+ static int amaudio_open(struct inode *inode, struct file *file)
+@@ -317,16 +327,16 @@ void cover_memcpy(struct BUF *des, int a, struct BUF *src, int b,
+ 	int i;
+ 	int samp;
+ 
+-	short *des_left = (short *)(des->addr + a);
+-	short *des_right = des_left + 16;
+-	short *src_buf = (short *)(src->addr + b);
++	int16_t *des_left = (int16_t *)(des->addr + a);
++	int16_t *des_right = des_left + 16;
++	int16_t *src_buf = (int16_t *)(src->addr + b);
+ 
+ #ifdef CONFIG_SND_AML_SPLIT_MODE
+-	for (i = 0; i < count; i += 2) {
++	for (i = 0; i < count; i += 4) {
+ 		samp = ((*src_buf++) * direct_left_gain) >> 8;
+-		*des_left++ = (short)samp;
++		*des_left++ = (int16_t)samp;
+ 		samp = ((*src_buf++) * direct_right_gain) >> 8;
+-		*des_right++ = (short)samp;
++		*des_right++ = (int16_t)samp;
+ 	}
+ #else
+ 	int j;
+@@ -334,9 +344,9 @@ void cover_memcpy(struct BUF *des, int a, struct BUF *src, int b,
+ 	for (i = 0; i < count; i += 64) {
+ 		for (j = 0; j < 16; j++) {
+ 			samp = ((*src_buf++) * direct_left_gain) >> 8;
+-			*des_left++ = (short)samp;
++			*des_left++ = (int16_t)samp;
+ 			samp = ((*src_buf++) * direct_right_gain) >> 8;
+-			*des_right++ = (short)samp;
++			*des_right++ = (int16_t)samp;
+ 		}
+ 		des_left += 16;
+ 		des_right += 16;
+@@ -350,12 +360,12 @@ void direct_mix_memcpy(struct BUF *des, int a, struct BUF *src, int b,
+ 	int i;
+ 	int samp;
+ 
+-	short *des_left = (short *)(des->addr + a);
+-	short *des_right = des_left + 16;
+-	short *src_buf = (short *)(src->addr + b);
++	int16_t *des_left = (int16_t *)(des->addr + a);
++	int16_t *des_right = des_left + 16;
++	int16_t *src_buf = (int16_t *)(src->addr + b);
+ 
+ #ifdef CONFIG_SND_AML_SPLIT_MODE
+-	for (i = 0; i < count; i += 2) {
++	for (i = 0; i < count; i += 4) {
+ 		samp = ((*des_left) * music_gain +
+ 			(*src_buf++) * direct_left_gain) >> 8;
+ 		*des_left++ = clip16(samp);
+@@ -387,15 +397,15 @@ void inter_mix_memcpy(struct BUF *des, int a, struct BUF *src, int b,
+ 				unsigned count)
+ {
+ 	int i;
+-	short sampL, sampR;
++	int16_t sampL, sampR;
+ 	int samp, sampLR;
+ 
+-	short *des_left = (short *)(des->addr + a);
+-	short *des_right = des_left + 16;
+-	short *src_buf = (short *)(src->addr + b);
++	int16_t *des_left = (int16_t *)(des->addr + a);
++	int16_t *des_right = des_left + 16;
++	int16_t *src_buf = (int16_t *)(src->addr + b);
+ 
+ #ifdef CONFIG_SND_AML_SPLIT_MODE
+-	for (i = 0; i < count; i += 2) {
++	for (i = 0; i < count; i += 4) {
+ 		sampL = *src_buf++;
+ 		sampR = *src_buf++;
+ 		/* Here has risk to distortion.
+@@ -437,70 +447,102 @@ void cover_memcpy_8_channel(struct BUF *des, int a, struct BUF *src, int b,
+ 				unsigned count)
+ {
+ 	int i;
+-	int32_t *lf, *cf, *rf, *ls, *rs, *lef, *sbl, *sbr;
+-	int32_t *to = (int32_t *)(des->addr + a);
+-	int32_t *tfrom = (int32_t *)(src->addr + b);
+-
+ #ifdef CONFIG_SND_AML_SPLIT_MODE
+-	lf = to;
+-	cf = to + 1;
+-	rf = to + 2;
+-	ls = to + 3;
+-	rs = to + 4;
+-	lef = to + 5;
+-	sbl = to + 6;
+-	sbr = to + 7;
+-
+-	for (i = 0; i < count; i += 32) {
+-		*lf++ = (int32_t)(((long)(*tfrom++) * direct_left_gain) >> 8);
+-		*cf++ = (int32_t)(((long)(*tfrom++) * direct_right_gain) >> 8);
+-		*rf++ = (int32_t)(((long)(*tfrom++) * direct_left_gain) >> 8);
+-		*ls++ = (int32_t)(((long)(*tfrom++) * direct_right_gain) >> 8);
+-		*rs++ = (int32_t)(((long)(*tfrom++) * direct_left_gain) >> 8);
+-		*lef++ = (int32_t)(((long)(*tfrom++) * direct_right_gain) >> 8);
+-		*sbl++ = (int32_t)(((long)(*tfrom++) * direct_left_gain) >> 8);
+-		*sbr++ = (int32_t)(((long)(*tfrom++) * direct_right_gain) >> 8);
+-
+-		lf += 7;
+-		cf += 7;
+-		rf += 7;
+-		ls += 7;
+-		rs += 7;
+-		lef += 7;
+-		sbl += 7;
+-		sbr += 7;
++	if (aml_i2s_playback_format == 32 || aml_i2s_playback_format == 24) {
++		int32_t *to = (int32_t *)(des->addr + a);
++		int32_t *tfrom = (int32_t *)(src->addr + b);
++		for (i = 0; i < count; i += 8) {
++			*to++ = (int32_t)
++				(((long)(*tfrom++) * direct_left_gain) >> 8);
++			*to++ = (int32_t)
++				(((long)(*tfrom++) * direct_right_gain) >> 8);
++		}
++	} else {
++		int16_t *to = (int16_t *)(des->addr + a);
++		int16_t *tfrom = (int16_t *)(src->addr + b);
++		for (i = 0; i < count; i += 4) {
++			*to++ = (int16_t)
++				(((*tfrom++) * direct_left_gain) >> 8);
++			*to++ = (int16_t)
++				(((*tfrom++) * direct_right_gain) >> 8);
++		}
+ 	}
+ #else
+ 	int j;
+-
+-	lf = to;
+-	cf = to + 1 * 8;
+-	rf = to + 2 * 8;
+-	ls = to + 3 * 8;
+-	rs = to + 4 * 8;
+-	lef = to + 5 * 8;
+-	sbl = to + 6 * 8;
+-	sbr = to + 7 * 8;
+-
+-	for (j = 0; j < count; j += 256) {
+-		for (i = 0; i < 8; i++) {
+-			*lf++ = (((*tfrom++) >> 8) * direct_left_gain) >> 8;
+-			*cf++ = (((*tfrom++) >> 8) * direct_right_gain) >> 8;
+-			*rf++ = (((*tfrom++) >> 8) * direct_left_gain) >> 8;
+-			*ls++ = (((*tfrom++) >> 8) * direct_right_gain) >> 8;
+-			*rs++ = (((*tfrom++) >> 8) * direct_left_gain) >> 8;
+-			*lef++ = (((*tfrom++) >> 8) * direct_right_gain) >> 8;
+-			*sbl++ = (((*tfrom++) >> 8) * direct_left_gain) >> 8;
+-			*sbr++ = (((*tfrom++) >> 8) * direct_right_gain) >> 8;
++	if (aml_i2s_playback_format == 32 || aml_i2s_playback_format == 24) {
++		int32_t *to = (int32_t *)(des->addr + a);
++		int32_t *tfrom = (int32_t *)(src->addr + b);
++		int32_t *lf, *cf, *rf, *ls, *rs, *lef, *sbl, *sbr;
++
++		lf = to;
++		cf = to + 1 * 8;
++		rf = to + 2 * 8;
++		ls = to + 3 * 8;
++		rs = to + 4 * 8;
++		lef = to + 5 * 8;
++		sbl = to + 6 * 8;
++		sbr = to + 7 * 8;
++		for (j = 0; j < count; j += 256) {
++			for (i = 0; i < 8; i++) {
++				*lf++ = (((*tfrom++) >> 8) * direct_left_gain)
++					>> 8;
++				*cf++ = (((*tfrom++) >> 8) * direct_right_gain)
++					>> 8;
++				*rf++ = (((*tfrom++) >> 8) * direct_left_gain)
++					>> 8;
++				*ls++ = (((*tfrom++) >> 8) * direct_right_gain)
++					>> 8;
++				*rs++ = (((*tfrom++) >> 8) * direct_left_gain)
++					>> 8;
++				*lef++ = (((*tfrom++) >> 8) * direct_right_gain)
++					>> 8;
++				*sbl++ = (((*tfrom++) >> 8) * direct_left_gain)
++					>> 8;
++				*sbr++ = (((*tfrom++) >> 8) * direct_right_gain)
++					>> 8;
++			}
++			lf += 56;
++			cf += 56;
++			rf += 56;
++			ls += 56;
++			rs += 56;
++			lef += 56;
++			sbl += 56;
++			sbr += 56;
++		}
++	} else {
++		int16_t *to = (int16_t *)(des->addr + a);
++		int16_t *tfrom = (int16_t *)(src->addr + b);
++		int16_t *lf, *cf, *rf, *ls, *rs, *lef, *sbl, *sbr;
++
++		lf = to;
++		cf = to + 1 * 16;
++		rf = to + 2 * 16;
++		ls = to + 3 * 16;
++		rs = to + 4 * 16;
++		lef = to + 5 * 16;
++		sbl = to + 6 * 16;
++		sbr = to + 7 * 16;
++		for (j = 0; j < count; j += 256) {
++			for (i = 0; i < 16; i++) {
++				*lf++ = ((*tfrom++) * direct_left_gain) >> 8;
++				*cf++ = ((*tfrom++) * direct_right_gain) >> 8;
++				*rf++ = ((*tfrom++) * direct_left_gain) >> 8;
++				*ls++ = ((*tfrom++) * direct_right_gain) >> 8;
++				*rs++ = ((*tfrom++) * direct_left_gain) >> 8;
++				*lef++ = ((*tfrom++) * direct_right_gain) >> 8;
++				*sbl++ = ((*tfrom++) * direct_left_gain) >> 8;
++				*sbr++ = ((*tfrom++) * direct_right_gain) >> 8;
++			}
++			lf += 7 * 16;
++			cf += 7 * 16;
++			rf += 7 * 16;
++			ls += 7 * 16;
++			rs += 7 * 16;
++			lef += 7 * 16;
++			sbl += 7 * 16;
++			sbr += 7 * 16;
+ 		}
+-		lf += 56;
+-		cf += 56;
+-		rf += 56;
+-		ls += 56;
+-		rs += 56;
+-		lef += 56;
+-		sbl += 56;
+-		sbr += 56;
+ 	}
+ #endif
+ }
+@@ -509,103 +551,140 @@ void direct_mix_memcpy_8_channel(struct BUF *des, int a, struct BUF *src, int b,
+ 				unsigned count)
+ {
+ 	int i;
+-	int32_t *lf, *cf, *rf, *ls, *rs, *lef, *sbl, *sbr;
+-	int32_t *to = (int32_t *)(des->addr + a);
+-	int32_t *tfrom = (int32_t *)(src->addr + b);
+-	int32_t samp;
++	int samp;
+ 
+ #ifdef CONFIG_SND_AML_SPLIT_MODE
+-	lf = to;
+-	cf = to + 1;
+-	rf = to + 2;
+-	ls = to + 3;
+-	rs = to + 4;
+-	lef = to + 5;
+-	sbl = to + 6;
+-	sbr = to + 7;
+-
+-	for (i = 0; i < count; i += 32) {
+-		samp = *lf;
+-		*lf++ = (int32_t)((long)(((samp) * music_gain +
+-			(*tfrom++) * direct_left_gain)) >> 8);
+-		samp = *cf;
+-		*cf++ = (int32_t)((long)(((samp) * music_gain +
+-			(*tfrom++) * direct_right_gain)) >> 8);
+-		samp = *rf;
+-		*rf++ = (int32_t)((long)(((samp) * music_gain +
+-			(*tfrom++) * direct_left_gain)) >> 8);
+-		samp = *ls;
+-		*ls++ = (int32_t)((long)(((samp) * music_gain +
+-			(*tfrom++) * direct_right_gain)) >> 8);
+-		samp = *rs;
+-		*rs++ = (int32_t)((long)(((samp) * music_gain +
+-			(*tfrom++) * direct_left_gain)) >> 8);
+-		samp = *lef;
+-		*lef++ = (int32_t)((long)(((samp) * music_gain +
+-			(*tfrom++) * direct_right_gain)) >> 8);
+-		samp = *sbl;
+-		*sbl++ = (int32_t)((long)(((samp) * music_gain +
+-			(*tfrom++) * direct_left_gain)) >> 8);
+-		samp = *sbr;
+-		*sbr++ = (int32_t)((long)(((samp) * music_gain +
+-			(*tfrom++) * direct_right_gain)) >> 8);
+-
+-		lf += 7;
+-		cf += 7;
+-		rf += 7;
+-		ls += 7;
+-		rs += 7;
+-		lef += 7;
+-		sbl += 7;
+-		sbr += 7;
+-	}
++	if (aml_i2s_playback_format == 32 || aml_i2s_playback_format == 24) {
++		int32_t *to = (int32_t *)(des->addr + a);
++		int32_t *tfrom = (int32_t *)(src->addr + b);
++		for (i = 0; i < count; i += 8) {
++			samp = *to;
++			*to++ = clip32(((long)(samp) * music_gain +
++				(long)(*tfrom++) * direct_left_gain) >> 8);
++			samp = *to;
++			*to++ = clip32(((long)(samp) * music_gain +
++				(long)(*tfrom++) * direct_right_gain) >> 8);
++		}
++	 } else {
++		int16_t *to = (int16_t *)(des->addr + a);
++		int16_t *tfrom = (int16_t *)(src->addr + b);
++		for (i = 0; i < count; i += 4) {
++			samp = *to;
++			*to++ = clip16(((samp) * music_gain +
++				(*tfrom++) * direct_left_gain) >> 8);
++			samp = *to;
++			*to++ = clip16(((samp) * music_gain +
++				(*tfrom++) * direct_right_gain) >> 8);
++		}
++	 }
+ #else
+ 	int j;
+-
+-	lf = to;
+-	cf = to + 1 * 8;
+-	rf = to + 2 * 8;
+-	ls = to + 3 * 8;
+-	rs = to + 4 * 8;
+-	lef = to + 5 * 8;
+-	sbl = to + 6 * 8;
+-	sbr = to + 7 * 8;
+-
+-	for (j = 0; j < count; j += 256) {
+-		for (i = 0; i < 8; i++) {
+-			samp = *lf;
+-			*lf++ = clip24(((samp) * music_gain +
+-				((*tfrom++) >> 8) * direct_left_gain) >> 8);
+-			samp = *cf;
+-			*cf++ = clip24(((samp) * music_gain +
+-				((*tfrom++) >> 8) * direct_right_gain) >> 8);
+-			samp = *rf;
+-			*rf++ = clip24(((samp) * music_gain +
+-				((*tfrom++) >> 8) * direct_left_gain) >> 8);
+-			samp = *ls;
+-			*ls++ = clip24(((samp) * music_gain +
+-				((*tfrom++) >> 8) * direct_right_gain) >> 8);
+-			samp = *rs;
+-			*rs++ = clip24(((samp) * music_gain +
+-				((*tfrom++) >> 8) * direct_left_gain) >> 8);
+-			samp = *lef;
+-			*lef++ = clip24(((samp) * music_gain +
+-				((*tfrom++) >> 8) * direct_right_gain) >> 8);
+-			samp = *sbl;
+-			*sbl++ = clip24(((samp) * music_gain +
+-				((*tfrom++) >> 8) * direct_left_gain) >> 8);
+-			samp = *sbr;
+-			*sbr++ = clip24(((samp) * music_gain +
+-				((*tfrom++) >> 8) * direct_right_gain) >> 8);
++	if (aml_i2s_playback_format == 32 || aml_i2s_playback_format == 24) {
++		int32_t *to = (int32_t *)(des->addr + a);
++		int32_t *tfrom = (int32_t *)(src->addr + b);
++		int32_t *lf, *cf, *rf, *ls, *rs, *lef, *sbl, *sbr;
++
++		lf = to;
++		cf = to + 1 * 8;
++		rf = to + 2 * 8;
++		ls = to + 3 * 8;
++		rs = to + 4 * 8;
++		lef = to + 5 * 8;
++		sbl = to + 6 * 8;
++		sbr = to + 7 * 8;
++		for (j = 0; j < count; j += 256) {
++			for (i = 0; i < 8; i++) {
++				samp = *lf;
++				*lf++ = clip24(((samp) * music_gain +
++					((*tfrom++) >> 8) * direct_left_gain)
++					>> 8);
++				samp = *cf;
++				*cf++ = clip24(((samp) * music_gain +
++					((*tfrom++) >> 8) * direct_right_gain)
++					>> 8);
++				samp = *rf;
++				*rf++ = clip24(((samp) * music_gain +
++					((*tfrom++) >> 8) * direct_left_gain)
++					>> 8);
++				samp = *ls;
++				*ls++ = clip24(((samp) * music_gain +
++					((*tfrom++) >> 8) * direct_right_gain)
++					>> 8);
++				samp = *rs;
++				*rs++ = clip24(((samp) * music_gain +
++					((*tfrom++) >> 8) * direct_left_gain)
++					>> 8);
++				samp = *lef;
++				*lef++ = clip24(((samp) * music_gain +
++					((*tfrom++) >> 8) * direct_right_gain)
++					>> 8);
++				samp = *sbl;
++				*sbl++ = clip24(((samp) * music_gain +
++					((*tfrom++) >> 8) * direct_left_gain)
++					>> 8);
++				samp = *sbr;
++				*sbr++ = clip24(((samp) * music_gain +
++					((*tfrom++) >> 8) * direct_right_gain)
++					>> 8);
++			}
++			lf += 56;
++			cf += 56;
++			rf += 56;
++			ls += 56;
++			rs += 56;
++			lef += 56;
++			sbl += 56;
++			sbr += 56;
++		}
++	} else {
++		int16_t *to = (int16_t *)(des->addr + a);
++		int16_t *tfrom = (int16_t *)(src->addr + b);
++		int16_t *lf, *cf, *rf, *ls, *rs, *lef, *sbl, *sbr;
++
++		lf = to;
++		cf = to + 1 * 16;
++		rf = to + 2 * 16;
++		ls = to + 3 * 16;
++		rs = to + 4 * 16;
++		lef = to + 5 * 16;
++		sbl = to + 6 * 16;
++		sbr = to + 7 * 16;
++		for (j = 0; j < count; j += 256) {
++			for (i = 0; i < 16; i++) {
++				samp = *lf;
++				*lf++ = clip16(((samp) * music_gain +
++					(*tfrom++) * direct_left_gain) >> 8);
++				samp = *cf;
++				*cf++ = clip16(((samp) * music_gain +
++					(*tfrom++) * direct_right_gain) >> 8);
++				samp = *rf;
++				*rf++ = clip16(((samp) * music_gain +
++					(*tfrom++) * direct_left_gain) >> 8);
++				samp = *ls;
++				*ls++ = clip16(((samp) * music_gain +
++					(*tfrom++) * direct_right_gain) >> 8);
++				samp = *rs;
++				*rs++ = clip16(((samp) * music_gain +
++					(*tfrom++) * direct_left_gain) >> 8);
++				samp = *lef;
++				*lef++ = clip16(((samp) * music_gain +
++					(*tfrom++) * direct_right_gain) >> 8);
++				samp = *sbl;
++				*sbl++ = clip16(((samp) * music_gain +
++					(*tfrom++) * direct_left_gain) >> 8);
++				samp = *sbr;
++				*sbr++ = clip16(((samp) * music_gain +
++					(*tfrom++) * direct_right_gain) >> 8);
++			}
++			lf += 7 * 16;
++			cf += 7 * 16;
++			rf += 7 * 16;
++			ls += 7 * 16;
++			rs += 7 * 16;
++			lef += 7 * 16;
++			sbl += 7 * 16;
++			sbr += 7 * 16;
+ 		}
+-		lf += 56;
+-		cf += 56;
+-		rf += 56;
+-		ls += 56;
+-		rs += 56;
+-		lef += 56;
+-		sbl += 56;
+-		sbr += 56;
+ 	}
+ #endif
+ }
+@@ -614,119 +693,181 @@ void inter_mix_memcpy_8_channel(struct BUF *des, int a, struct BUF *src, int b,
+ 				unsigned count)
+ {
+ 	int i;
+-	int32_t *lf, *cf, *rf, *ls, *rs, *lef, *sbl, *sbr;
+-	int32_t *to = (int32_t *)(des->addr + a);
+-	int32_t *tfrom = (int32_t *)(src->addr + b);
+-	int32_t samp, sampLR, sampL, sampR;
++	int samp, sampLR, sampL, sampR;
+ 
+ #ifdef CONFIG_SND_AML_SPLIT_MODE
+-	lf = to;
+-	cf = to + 1;
+-	rf = to + 2;
+-	ls = to + 3;
+-	rs = to + 4;
+-	lef = to + 5;
+-	sbl = to + 6;
+-	sbr = to + 7;
+-
+-	for (i = 0; i < count; i += 32) {
+-		sampL = (int32_t)((long)((*tfrom++) * direct_left_gain) >> 8);
+-		sampR = (int32_t)((long)((*tfrom++) * direct_right_gain) >> 8);
+-		sampLR = (sampL + sampR) >> 1;
+-
+-		samp = *lf;
+-		*lf++ = (int32_t)((long)samp * music_gain + sampLR);
+-		samp = *cf;
+-		*cf++ = (int32_t)((long)samp * music_gain + sampLR);
+-
+-		sampL = (int32_t)((long)((*tfrom++) * direct_left_gain) >> 8);
+-		sampR = (int32_t)((long)((*tfrom++) * direct_right_gain) >> 8);
+-		sampLR = (sampL + sampR) >> 1;
+-		samp = *rf;
+-		*rf++ = (int32_t)((long)samp * music_gain + sampLR);
+-		samp = *ls;
+-		*ls++ = (int32_t)((long)samp * music_gain + sampLR);
+-
+-		sampL = (int32_t)((long)((*tfrom++) * direct_left_gain) >> 8);
+-		sampR = (int32_t)((long)((*tfrom++) * direct_right_gain) >> 8);
+-		sampLR = (sampL + sampR) >> 1;
+-		samp = *rs;
+-		*rs++ = (int32_t)((long)samp * music_gain + sampLR);
+-		samp = *lef;
+-		*lef++ = (int32_t)((long)samp * music_gain + sampLR);
+-
+-		sampL = (int32_t)((long)((*tfrom++) * direct_left_gain) >> 8);
+-		sampR = (int32_t)((long)((*tfrom++) * direct_right_gain) >> 8);
+-		sampLR = (sampL + sampR) >> 1;
+-		samp = *sbl;
+-		*sbl++ = (int32_t)((long)samp * music_gain + sampLR);
+-		samp = *sbr;
+-		*sbr++ = (int32_t)((long)samp * music_gain + sampLR);
+-
+-		lf += 7;
+-		cf += 7;
+-		rf += 7;
+-		ls += 7;
+-		rs += 7;
+-		lef += 7;
+-		sbl += 7;
+-		sbr += 7;
+-	}
+-#else
+-	int j;
+-
+-	lf = to;
+-	cf = to + 1 * 8;
+-	rf = to + 2 * 8;
+-	ls = to + 3 * 8;
+-	rs = to + 4 * 8;
+-	lef = to + 5 * 8;
+-	sbl = to + 6 * 8;
+-	sbr = to + 7 * 8;
+-
+-	for (j = 0; j < count; j += 256) {
+-		for (i = 0; i < 8; i++) {
+-			sampL = (((*tfrom++) >> 8) * direct_left_gain) >> 8;
+-			sampR = (((*tfrom++) >> 8) * direct_right_gain) >> 8;
++	if (aml_i2s_playback_format == 32 || aml_i2s_playback_format == 24) {
++		int32_t *to = (int32_t *)(des->addr + a);
++		int32_t *tfrom = (int32_t *)(src->addr + b);
++		for (i = 0; i < count; i += 8) {
++			sampL = (int)
++				(((long)(*tfrom++) * direct_left_gain) >> 8);
++			sampR = (int)
++				(((long)(*tfrom++) * direct_right_gain) >> 8);
+ 			sampLR = (sampL + sampR) >> 1;
+ 
+-			samp = *lf;
+-			*lf++ = clip24(((samp) >> 8) * music_gain + sampLR);
+-			samp = *cf;
+-			*cf++ = clip24(((samp) >> 8) * music_gain + sampLR);
+-
+-			sampL = (((*tfrom++) >> 8) * direct_left_gain) >> 8;
+-			sampR = (((*tfrom++) >> 8) * direct_right_gain) >> 8;
+-			sampLR = (sampL + sampR) >> 1;
+-			samp = *rf;
+-			*rf++ = clip24(((samp) >> 8) * music_gain + sampLR);
+-			samp = *ls;
+-			*ls++ = clip24(((samp) >> 8) * music_gain + sampLR);
+-
+-			sampL = (((*tfrom++) >> 8) * direct_left_gain) >> 8;
+-			sampR = (((*tfrom++) >> 8) * direct_right_gain) >> 8;
++			samp = *to;
++			*to++ = clip32(
++				(((long)samp * music_gain) >> 8) + sampLR);
++			samp = *to;
++			*to++ = clip32(
++				(((long)samp * music_gain) >> 8) + sampLR);
++		}
++	} else {
++		int16_t *to = (int16_t *)(des->addr + a);
++		int16_t *tfrom = (int16_t *)(src->addr + b);
++		for (i = 0; i < count; i += 4) {
++			sampL = (int)(((*tfrom++) * direct_left_gain) >> 8);
++			sampR = (int)(((*tfrom++) * direct_right_gain) >> 8);
+ 			sampLR = (sampL + sampR) >> 1;
+-			samp = *rs;
+-			*rs++ = clip24(((samp) >> 8) * music_gain + sampLR);
+-			samp = *lef;
+-			*lef++ = clip24(((samp) >> 8) * music_gain + sampLR);
+ 
+-			sampL = (((*tfrom++) >> 8) * direct_left_gain) >> 8;
+-			sampR = (((*tfrom++) >> 8) * direct_right_gain) >> 8;
+-			sampLR = (sampL + sampR) >> 1;
+-			samp = *sbl;
+-			*sbl++ = clip24(((samp) >> 8) * music_gain + sampLR);
+-			samp = *sbr;
+-			*sbr++ = clip24(((samp) >> 8) * music_gain + sampLR);
++			samp = *to;
++			*to++ = clip16(
++				(((long)samp * music_gain) >> 8) + sampLR);
++			samp = *to;
++			*to++ = clip16(
++				(((long)samp * music_gain) >> 8) + sampLR);
++		}
++	}
++#else
++	int j;
++	if (aml_i2s_playback_format == 32 || aml_i2s_playback_format == 24) {
++		int32_t *to = (int32_t *)(des->addr + a);
++		int32_t *tfrom = (int32_t *)(src->addr + b);
++		int32_t *lf, *cf, *rf, *ls, *rs, *lef, *sbl, *sbr;
++
++		lf = to;
++		cf = to + 1 * 8;
++		rf = to + 2 * 8;
++		ls = to + 3 * 8;
++		rs = to + 4 * 8;
++		lef = to + 5 * 8;
++		sbl = to + 6 * 8;
++		sbr = to + 7 * 8;
++		for (j = 0; j < count; j += 256) {
++			for (i = 0; i < 8; i++) {
++				sampL = (((*tfrom++) >> 8) * direct_left_gain)
++					>> 8;
++				sampR = (((*tfrom++) >> 8) * direct_right_gain)
++					>> 8;
++				sampLR = (sampL + sampR) >> 1;
++
++				samp = *lf;
++				*lf++ = clip24(
++					((samp * music_gain) >> 8) + sampLR);
++				samp = *cf;
++				*cf++ = clip24(
++					((samp * music_gain) >> 8) + sampLR);
++
++				sampL = (((*tfrom++) >> 8) * direct_left_gain)
++					>> 8;
++				sampR = (((*tfrom++) >> 8) * direct_right_gain)
++					>> 8;
++				sampLR = (sampL + sampR) >> 1;
++				samp = *rf;
++				*rf++ = clip24(
++					((samp * music_gain) >> 8) + sampLR);
++				samp = *ls;
++				*ls++ = clip24(
++					((samp * music_gain) >> 8) + sampLR);
++
++				sampL = (((*tfrom++) >> 8) * direct_left_gain)
++					>> 8;
++				sampR = (((*tfrom++) >> 8) * direct_right_gain)
++					>> 8;
++				sampLR = (sampL + sampR) >> 1;
++				samp = *rs;
++				*rs++ = clip24(
++					((samp * music_gain) >> 8) + sampLR);
++				samp = *lef;
++				*lef++ = clip24(
++					((samp * music_gain) >> 8) + sampLR);
++
++				sampL = (((*tfrom++) >> 8) * direct_left_gain)
++					>> 8;
++				sampR = (((*tfrom++) >> 8) * direct_right_gain)
++					>> 8;
++				sampLR = (sampL + sampR) >> 1;
++				samp = *sbl;
++				*sbl++ = clip24(
++					((samp * music_gain) >> 8) + sampLR);
++				samp = *sbr;
++				*sbr++ = clip24(
++					((samp * music_gain) >> 8) + sampLR);
++			}
++			lf += 56;
++			cf += 56;
++			rf += 56;
++			ls += 56;
++			rs += 56;
++			lef += 56;
++			sbl += 56;
++			sbr += 56;
++		}
++	} else {
++		int16_t *to = (int16_t *)(des->addr + a);
++		int16_t *tfrom = (int16_t *)(src->addr + b);
++		int16_t *lf, *cf, *rf, *ls, *rs, *lef, *sbl, *sbr;
++
++		lf = to;
++		cf = to + 1 * 16;
++		rf = to + 2 * 16;
++		ls = to + 3 * 16;
++		rs = to + 4 * 16;
++		lef = to + 5 * 16;
++		sbl = to + 6 * 16;
++		sbr = to + 7 * 16;
++		for (j = 0; j < count; j += 256) {
++			for (i = 0; i < 16; i++) {
++				sampL = ((*tfrom++) * direct_left_gain) >> 8;
++				sampR = ((*tfrom++) * direct_right_gain) >> 8;
++				sampLR = (sampL + sampR) >> 1;
++				samp = *lf;
++				*lf++ = clip16(
++					((samp * music_gain) >> 8) + sampLR);
++				samp = *cf;
++				*cf++ = clip16(
++					((samp * music_gain) >> 8) + sampLR);
++
++				sampL = ((*tfrom++) * direct_left_gain) >> 8;
++				sampR = ((*tfrom++) * direct_right_gain) >> 8;
++				sampLR = (sampL + sampR) >> 1;
++				samp = *rf;
++				*rf++ = clip16(
++					((samp * music_gain) >> 8) + sampLR);
++				samp = *ls;
++				*ls++ = clip16(
++					((samp * music_gain) >> 8) + sampLR);
++
++				sampL = ((*tfrom++) * direct_left_gain) >> 8;
++				sampR = ((*tfrom++) * direct_right_gain) >> 8;
++				sampLR = (sampL + sampR) >> 1;
++				samp = *rs;
++				*rs++ = clip16(
++					((samp * music_gain) >> 8) + sampLR);
++				samp = *lef;
++				*lef++ = clip16(
++					((samp * music_gain) >> 8) + sampLR);
++
++				sampL = ((*tfrom++) * direct_left_gain) >> 8;
++				sampR = ((*tfrom++) * direct_right_gain) >> 8;
++				sampLR = (sampL + sampR) >> 1;
++				samp = *sbl;
++				*sbl++ = clip16(
++					((samp * music_gain) >> 8) + sampLR);
++				samp = *sbr;
++				*sbr++ = clip16(
++					((samp * music_gain) >> 8) + sampLR);
++			}
++			lf += 7 * 16;
++			cf += 7 * 16;
++			rf += 7 * 16;
++			ls += 7 * 16;
++			rs += 7 * 16;
++			lef += 7 * 16;
++			sbl += 7 * 16;
++			sbr += 7 * 16;
+ 		}
+-		lf += 56;
+-		cf += 56;
+-		rf += 56;
+-		ls += 56;
+-		rs += 56;
+-		lef += 56;
+-		sbl += 56;
+-		sbr += 56;
+ 	}
+ #endif
+ }
+diff --git a/drivers/amlogic/amaudio2/amaudio2.h b/drivers/amlogic/amaudio2/amaudio2.h
+index d3f0708..7fc6cff 100644
+--- a/drivers/amlogic/amaudio2/amaudio2.h
++++ b/drivers/amlogic/amaudio2/amaudio2.h
+@@ -86,6 +86,7 @@ extern unsigned long aml_i2s_playback_start_addr;
+ extern unsigned long aml_i2s_playback_phy_start_addr;
+ extern unsigned long aml_i2s_alsa_write_addr;
+ extern unsigned int aml_i2s_playback_channel;
++extern unsigned int aml_i2s_playback_format;
+ 
+ #define AMAUDIO_IOC_MAGIC  'A'
+ 
+diff --git a/sound/soc/aml/m8/aml_audio_hw.c b/sound/soc/aml/m8/aml_audio_hw.c
+index 6851e61..776bf4b 100644
+--- a/sound/soc/aml/m8/aml_audio_hw.c
++++ b/sound/soc/aml/m8/aml_audio_hw.c
+@@ -90,61 +90,6 @@ unsigned audioin_mode = I2SIN_MASTER_MODE;
+ /* 1 => 'h800000 */
+ unsigned int dac_mute_const = 0x800000;
+ 
+-/*
+-				fIn * (M)
+-	    Fout   =  -----------------------------
+-			    (N) * (OD+1) * (XD)
+-*/
+-int audio_clock_config_table[][13][2] = {
+-	{
+-	 /* 256 */
+-#if OVERCLOCK == 0
+-	 {0x0005cc08, (60 - 1)},	/* 32 */
+-	 {0x0005e965, (40 - 1)},	/* 44.1 */
+-	 {0x0007c4e6, (23 - 1)},	/* 48K */
+-	 {0x0005cc08, (20 - 1)},	/* 96k ,24.576M */
+-	 {0x0005cc08, (10 - 1)},	/* 192k, 49.152M */
+-	 {0x0007f400, (125 - 1)},	/* 8k */
+-	 {0x0006c6f6, (116 - 1)},	/* 11.025 */
+-	 {0x0007e47f, (86 - 1)},	/* 12 */
+-	 {0x0004f880, (100 - 1)},	/* 16 */
+-	 {0x0004c4a4, (87 - 1)},	/* 22.05 */
+-	 {0x0007e47f, (43 - 1)},	/* 24 */
+-	 {0x0007f3f0, (127 - 1)},	/* 7875 */
+-	 {0x0005c88b, (22 - 1)},	/* 88.2k ,22.579M */
+-#else
+-	 /* 512FS */
+-	 {0x0004f880, (25 - 1)},	/* 32 */
+-	 {0x0004cdf3, (21 - 1)},	/* 44.1 */
+-	 {0x0006d0a4, (13 - 1)},	/* 48 */
+-	 {0x0004e15a, (9 - 1)},
+-	 {0x0006f207, (3 - 1)},
+-	 {0x0004f880, (100 - 1)},	/* 8k */
+-	 {0x0004c4a4, (87 - 1)},	/* 11.025 */
+-	 {0x0007e47f, (43 - 1)},	/* 12 */
+-	 {0x0004f880, (50 - 1)},	/* 16 */
+-	 {0x0004cdf3, (42 - 1)},	/* 22.05 */
+-	 {0x0007c4e6, (23 - 1)},	/* 24 */
+-	 {0x0006e1b6, (76 - 1)},	/* 7875 */
+-#endif
+-	 },
+-	{
+-	 /* 384 */
+-	 {0x0007c4e6, (23 - 1)},	/* 32 */
+-	 {0x0004c4a4, (29 - 1)},	/* 44.1 */
+-	 {0x0004cb18, (26 - 1)},	/* 48 */
+-	 {0x0004cb18, (13 - 1)},	/* 96 */
+-	 {0x0004e15a, (6 - 1)},
+-	 {0x0007e47f, (86 - 1)},	/* 8k */
+-	 {0x0007efa5, (61 - 1)},	/* 11.025 */
+-	 {0x0006de98, (67 - 1)},	/* 12 */
+-	 {0x0007e47f, (43 - 1)},	/* 16 */
+-	 {0x0004c4a4, (58 - 1)},	/* 22.05 */
+-	 {0x0004c60e, (53 - 1)},	/* 24 */
+-	 {0x0007fdfa, (83 - 1)},	/* 7875 */
+-	 }
+-};
+-
+ void audio_set_aiubuf(u32 addr, u32 size, unsigned int channel)
+ {
+ #ifdef CONFIG_SND_AML_SPLIT_MODE
+@@ -635,42 +580,6 @@ void audio_set_i2s_mode(u32 mode)
+  *  This is dolby digital plus's spec
+  */
+ 
+-void audio_util_set_dac_format(unsigned format)
+-{
+-	/* 958 divisor more, if true, divided by 2, 4, 6, 8. */
+-	aml_write_cbus(AIU_CLK_CTRL, (0 << 12) |
+-	/* alrclk skew: 1=alrclk transitions on the cycle before msb is sent */
+-		       (1 << 8) |
+-		       (1 << 6) |
+-	/* invert aoclk */
+-		       (1 << 7) |
+-	/* invert lrclk */
+-#if OVERCLOCK == 1
+-	/* 958 divisor: 0=no div; 1=div by 2; 2=div by 3; 3=div by 4. */
+-		       (1 << 4) |
+-	/* i2s divisor: 0=no div; 1=div by 2; 2=div by 4; 3=div by 8. */
+-		       (3 << 2) |
+-#else
+-	/* 958 divisor: 0=no div; 1=div by 2; 2=div by 3; 3=div by 4. */
+-		       (1 << 4) |
+-	/* i2s divisor: 0=no div; 1=div by 2; 2=div by 4; 3=div by 8. */
+-		       (2 << 2) |
+-#endif
+-		       (1 << 1) |	/* enable 958 clock */
+-		       (1 << 0));	/* enable I2S clock */
+-	if (format == AUDIO_ALGOUT_DAC_FORMAT_DSP)
+-		aml_cbus_update_bits(AIU_CLK_CTRL, 0x3 << 8, 1 << 8);
+-	else if (format == AUDIO_ALGOUT_DAC_FORMAT_LEFT_JUSTIFY)
+-		aml_cbus_update_bits(AIU_CLK_CTRL, 0x3 << 8, 0);
+-
+-	if (dac_mute_const == 0x800000)
+-		aml_write_cbus(AIU_I2S_DAC_CFG, 0x000f);
+-	else
+-		/* Payload 24-bit, Msb first, alrclk = aoclk/64 */
+-		aml_write_cbus(AIU_I2S_DAC_CFG, 0x0007);
+-	aml_write_cbus(AIU_I2S_SOURCE_DESC, 0x0001);	/* four 2-channel */
+-}
+-
+ /* iec958 and i2s clock are separated after M6TV. */
+ void audio_util_set_dac_958_format(unsigned format)
+ {
+@@ -695,12 +604,13 @@ void audio_util_set_dac_i2s_format(unsigned format)
+ 	aml_cbus_update_bits(AIU_CLK_CTRL, 1 << 7, 1 << 7);
+ 	/* alrclk skew: 1=alrclk transitions on the cycle before msb is sent */
+ 	aml_cbus_update_bits(AIU_CLK_CTRL, 0x3 << 8, 1 << 8);
+-#if OVERCLOCK == 1
++#if MCLKFS_RATIO == 512
+ 	/* i2s divisor: 0=no div; 1=div by 2; 2=div by 4; 3=div by 8. */
+ 	aml_cbus_update_bits(AIU_CLK_CTRL, 0x3 << 2, 0x3 << 2);
+-#else
+-	/* i2s divisor: 0=no div; 1=div by 2; 2=div by 4; 3=div by 8. */
++#elif MCLKFS_RATIO == 256
+ 	aml_cbus_update_bits(AIU_CLK_CTRL, 0x3 << 2, 0x2 << 2);
++#else
++	aml_cbus_update_bits(AIU_CLK_CTRL, 0x3 << 2, 0x1 << 2);
+ #endif
+ 	/* enable I2S clock */
+ 	aml_cbus_update_bits(AIU_CLK_CTRL, 1, 1);
+diff --git a/sound/soc/aml/m8/aml_audio_hw.h b/sound/soc/aml/m8/aml_audio_hw.h
+index 6b28d30..2778692 100644
+--- a/sound/soc/aml/m8/aml_audio_hw.h
++++ b/sound/soc/aml/m8/aml_audio_hw.h
+@@ -139,7 +139,6 @@ void audio_i2s_unmute(void);
+ void audio_i2s_mute(void);
+ void aml_audio_i2s_unmute(void);
+ void aml_audio_i2s_mute(void);
+-void audio_util_set_dac_format(unsigned format);
+ void audio_util_set_dac_i2s_format(unsigned format);
+ void audio_util_set_dac_958_format(unsigned format);
+ void audio_set_958_mode(unsigned mode, struct _aiu_958_raw_setting_t *set);
+@@ -151,7 +150,6 @@ int if_audio_in_spdif_enable(void);
+ void audio_out_i2s_enable(unsigned flag);
+ void audio_hw_958_enable(unsigned flag);
+ void audio_out_enabled(int flag);
+-void audio_util_set_dac_format(unsigned format);
+ unsigned int audio_hdmi_init_ready(void);
+ unsigned int read_iec958_rd_ptr(void);
+ void audio_in_spdif_enable(int flag);
+@@ -163,16 +161,25 @@ void audio_i2s_958_same_source(unsigned int same);
+ extern unsigned int IEC958_mode_codec;
+ extern unsigned int clk81;
+ 
+-/*OVERCLOCK == 1,our SOC privide 512fs mclk,OVERCLOCK == 0 ,256fs*/
++/*OVERCLOCK == 1, our SOC privide 512fs mclk;
++  DOWNCLOCK == 1, 128fs;
++  normal mclk : 256fs */
+ #define OVERCLOCK 0
++#define DOWNCLOCK 0
++
+ #define IEC958_OVERCLOCK 1
+ 
+ #if (OVERCLOCK == 1)
+ #define MCLKFS_RATIO 512
++#elif (DOWNCLOCK == 1)
++#define MCLKFS_RATIO 128
+ #else
+ #define MCLKFS_RATIO 256
+ #endif
+ 
++#define DEFAULT_SAMPLERATE 48000
++#define DEFAULT_MCLK_RATIO_SR MCLKFS_RATIO
++
+ #define I2S_PLL_SRC         1	/* MPLL0 */
+ #define MPLL_I2S_CNTL		HHI_MPLL_MP0
+ 
+diff --git a/sound/soc/aml/m8/aml_i2s.c b/sound/soc/aml/m8/aml_i2s.c
+index a2bf64e..27905a1 100644
+--- a/sound/soc/aml/m8/aml_i2s.c
++++ b/sound/soc/aml/m8/aml_i2s.c
+@@ -63,6 +63,9 @@ EXPORT_SYMBOL(aml_i2s_alsa_write_addr);
+ unsigned int aml_i2s_playback_channel = 2;
+ EXPORT_SYMBOL(aml_i2s_playback_channel);
+ 
++unsigned int aml_i2s_playback_format = 16;
++EXPORT_SYMBOL(aml_i2s_playback_format);
++
+ static int trigger_underrun;
+ void aml_audio_hw_trigger(void)
+ {
+@@ -295,8 +298,15 @@ static int aml_i2s_prepare(struct snd_pcm_substream *substream)
+ 		dev_info(substream->pcm->card->dev, "clear i2s out trigger underrun\n");
+ 		trigger_underrun = 0;
+ 	}
+-	if (s && s->device_type == AML_AUDIO_I2SOUT)
++	if (s && s->device_type == AML_AUDIO_I2SOUT) {
+ 		aml_i2s_playback_channel = runtime->channels;
++		if (runtime->format == SNDRV_PCM_FORMAT_S16_LE)
++			aml_i2s_playback_format = 16;
++		else if (runtime->format == SNDRV_PCM_FORMAT_S32_LE)
++			aml_i2s_playback_format = 32;
++		else if (runtime->format == SNDRV_PCM_FORMAT_S24_LE)
++			aml_i2s_playback_format = 24;
++	}
+ 	tmp_buf->cached_len = 0;
+ 	return 0;
+ }
+@@ -587,10 +597,6 @@ static int aml_i2s_copy_playback(struct snd_pcm_runtime *runtime, int channel,
+ {
+ 	int res = 0;
+ 	int n;
+-#ifndef CONFIG_SND_AML_SPLIT_MODE
+-	int i = 0, j = 0;
+-	int align = runtime->channels * 32;
+-#endif
+ 	unsigned long offset = frames_to_bytes(runtime, pos);
+ 	char *hwbuf = runtime->dma_area + offset;
+ 	struct aml_runtime_data *prtd = runtime->private_data;
+@@ -600,6 +606,8 @@ static int aml_i2s_copy_playback(struct snd_pcm_runtime *runtime, int channel,
+ 	struct audio_stream *s = &prtd->s;
+ 	struct device *dev = substream->pcm->card->dev;
+ #ifndef CONFIG_SND_AML_SPLIT_MODE
++	int i = 0, j = 0;
++	int align = runtime->channels * 32;
+ 	int cached_len = tmp_buf->cached_len;
+ 	char *cache_buffer_bytes = tmp_buf->cache_buffer_bytes;
+ #endif
+@@ -658,51 +666,115 @@ static int aml_i2s_copy_playback(struct snd_pcm_runtime *runtime, int channel,
+ 		memcpy(hwbuf, ubuf, n);
+ #else
+ 		if (runtime->format == SNDRV_PCM_FORMAT_S16_LE) {
+-
+-			int16_t *tfrom, *to, *left, *right;
++			int16_t *tfrom, *to;
+ 			tfrom = (int16_t *) ubuf;
+ 			to = (int16_t *) hwbuf;
+ 
+-			left = to;
+-			right = to + 16;
++			if (runtime->channels == 8) {
++				int16_t *lf, *cf, *rf, *ls,
++						*rs, *lef, *sbl, *sbr;
++				lf = to;
++				cf = to + 16 * 1;
++				rf = to + 16 * 2;
++				ls = to + 16 * 3;
++				rs = to + 16 * 4;
++				lef = to + 16 * 5;
++				sbl = to + 16 * 6;
++				sbr = to + 16 * 7;
++				for (j = 0; j < n; j += 256) {
++					for (i = 0; i < 16; i++) {
++						*lf++ = (*tfrom++);
++						*cf++ = (*tfrom++);
++						*rf++ = (*tfrom++);
++						*ls++ = (*tfrom++);
++						*rs++ = (*tfrom++);
++						*lef++ = (*tfrom++);
++						*sbl++ = (*tfrom++);
++						*sbr++ = (*tfrom++);
++					}
++					lf += 7 * 16;
++					cf += 7 * 16;
++					rf += 7 * 16;
++					ls += 7 * 16;
++					rs += 7 * 16;
++					lef += 7 * 16;
++					sbl += 7 * 16;
++					sbr += 7 * 16;
++				}
++			} else if (runtime->channels == 2) {
++				int16_t *left, *right;
++				left = to;
++				right = to + 16;
+ 
+-			for (j = 0; j < n; j += 64) {
+-				for (i = 0; i < 16; i++) {
+-					*left++ = (*tfrom++);
+-					*right++ = (*tfrom++);
++				for (j = 0; j < n; j += 64) {
++					for (i = 0; i < 16; i++) {
++						*left++ = (*tfrom++);
++						*right++ = (*tfrom++);
++					}
++					left += 16;
++					right += 16;
+ 				}
+-				left += 16;
+-				right += 16;
+ 			}
+ 		} else if (runtime->format == SNDRV_PCM_FORMAT_S24_LE
+ 			   && I2S_MODE == AIU_I2S_MODE_PCM24) {
+-			int32_t *tfrom, *to, *left, *right;
++			int32_t *tfrom, *to;
+ 			tfrom = (int32_t *) ubuf;
+ 			to = (int32_t *) hwbuf;
+ 
+-			left = to;
+-			right = to + 8;
++			if (runtime->channels == 8) {
++				int32_t *lf, *cf, *rf, *ls,
++					*rs, *lef, *sbl, *sbr;
++				lf = to;
++				cf = to + 8 * 1;
++				rf = to + 8 * 2;
++				ls = to + 8 * 3;
++				rs = to + 8 * 4;
++				lef = to + 8 * 5;
++				sbl = to + 8 * 6;
++				sbr = to + 8 * 7;
++				for (j = 0; j < n; j += 256) {
++					for (i = 0; i < 8; i++) {
++						*lf++ = (*tfrom++);
++						*cf++ = (*tfrom++);
++						*rf++ = (*tfrom++);
++						*ls++ = (*tfrom++);
++						*rs++ = (*tfrom++);
++						*lef++ = (*tfrom++);
++						*sbl++ = (*tfrom++);
++						*sbr++ = (*tfrom++);
++					}
++					lf += 7 * 8;
++					cf += 7 * 8;
++					rf += 7 * 8;
++					ls += 7 * 8;
++					rs += 7 * 8;
++					lef += 7 * 8;
++					sbl += 7 * 8;
++					sbr += 7 * 8;
++				}
++			} else if (runtime->channels == 2) {
++				int32_t *left, *right;
++				left = to;
++				right = to + 8;
+ 
+-			for (j = 0; j < n; j += 64) {
+-				for (i = 0; i < 8; i++) {
+-					*left++ = (*tfrom++);
+-					*right++ = (*tfrom++);
++				for (j = 0; j < n; j += 64) {
++					for (i = 0; i < 8; i++) {
++						*left++ = (*tfrom++);
++						*right++ = (*tfrom++);
++					}
++					left += 8;
++					right += 8;
+ 				}
+-				left += 8;
+-				right += 8;
+ 			}
+ 
+ 		} else if (runtime->format == SNDRV_PCM_FORMAT_S32_LE) {
+-			int32_t *tfrom, *to, *left, *right;
++			int32_t *tfrom, *to;
+ 			tfrom = (int32_t *) ubuf;
+ 			to = (int32_t *) hwbuf;
+ 
+-			left = to;
+-			right = to + 8;
+-
+ 			if (runtime->channels == 8) {
+-				int32_t *lf, *cf, *rf, *ls, *rs, *lef, *sbl,
+-				    *sbr;
++				int32_t *lf, *cf, *rf, *ls,
++					*rs, *lef, *sbl, *sbr;
+ 				lf = to;
+ 				cf = to + 8 * 1;
+ 				rf = to + 8 * 2;
+@@ -731,7 +803,11 @@ static int aml_i2s_copy_playback(struct snd_pcm_runtime *runtime, int channel,
+ 					sbl += 7 * 8;
+ 					sbr += 7 * 8;
+ 				}
+-			} else {
++			} else if (runtime->channels == 2) {
++				int32_t *left, *right;
++				left = to;
++				right = to + 8;
++
+ 				for (j = 0; j < n; j += 64) {
+ 					for (i = 0; i < 8; i++) {
+ 						*left++ = (*tfrom++) >> 8;
+diff --git a/sound/soc/aml/m8/aml_i2s_dai.c b/sound/soc/aml/m8/aml_i2s_dai.c
+index 1bac72f..ace8740 100644
+--- a/sound/soc/aml/m8/aml_i2s_dai.c
++++ b/sound/soc/aml/m8/aml_i2s_dai.c
+@@ -50,8 +50,6 @@ struct aml_dai_info dai_info[3] = { {0} };
+ static int i2s_pos_sync;
+ 
+ /* extern int set_i2s_iec958_samesource(int enable); */
+-#define DEFAULT_SAMPLERATE 48000
+-#define DEFAULT_MCLK_RATIO_SR 256
+ 
+ /*
+ the I2S hw  and IEC958 PCM output initation,958 initation here,
+@@ -117,7 +115,7 @@ static void aml_dai_i2s_shutdown(struct snd_pcm_substream *substream,
+ 				 struct snd_soc_dai *dai)
+ {
+ 	if (IEC958_mode_codec == 0)
+-		aml_spdif_play(1);
++		aml_spdif_play(0);
+ 	return;
+ }
+ 
+diff --git a/sound/soc/aml/m8/aml_spdif_dai.c b/sound/soc/aml/m8/aml_spdif_dai.c
+index a76c952..afc64fa 100644
+--- a/sound/soc/aml/m8/aml_spdif_dai.c
++++ b/sound/soc/aml/m8/aml_spdif_dai.c
+@@ -74,7 +74,7 @@ static int flag_samesrc = -1;
+ 
+ void aml_spdif_play(int samesrc)
+ {
+-	if (is_meson_gxtvbb_cpu() == false) {
++	if ((is_meson_gxtvbb_cpu() == false) && (is_meson_txl_cpu() == false)) {
+ 		static int iec958buf[32 + 16];
+ 		struct _aiu_958_raw_setting_t set;
+ 		struct _aiu_958_channel_status_t chstat;
+@@ -119,7 +119,7 @@ void aml_spdif_play(int samesrc)
+ 		aml_cbus_update_bits(AIU_CLK_CTRL, 1 << 1, 1 << 1);
+ 		audio_util_set_dac_958_format(AUDIO_ALGOUT_DAC_FORMAT_DSP);
+ 		/*clear the same source function as new raw data output */
+-		audio_i2s_958_same_source(0);
++		audio_i2s_958_same_source(samesrc);
+ 		memset(iec958buf, 0, sizeof(iec958buf));
+ 		audio_set_958outbuf((virt_to_phys(iec958buf) + 63) & (~63),
+ 					128, 0);
+diff --git a/sound/soc/codecs/tas5707.c b/sound/soc/codecs/tas5707.c
+index 5b61999..6b4239a 100644
+--- a/sound/soc/codecs/tas5707.c
++++ b/sound/soc/codecs/tas5707.c
+@@ -16,7 +16,6 @@
+ 
+ #ifdef CONFIG_HAS_EARLYSUSPEND
+ #include <linux/earlysuspend.h>
+-static struct early_suspend early_suspend;
+ static void tas5707_early_suspend(struct early_suspend *h);
+ static void tas5707_late_resume(struct early_suspend *h);
+ #endif
+@@ -77,6 +76,7 @@ struct tas5707_priv {
+ 	unsigned char Ch1_vol;
+ 	unsigned char Ch2_vol;
+ 	unsigned mclk;
++	struct early_suspend early_suspend;
+ };
+ 
+ static const DECLARE_TLV_DB_SCALE(mvol_tlv, -12700, 50, 1);
+@@ -495,11 +495,11 @@ static int tas5707_probe(struct snd_soc_codec *codec)
+ 	struct tas57xx_platform_data *pdata = dev_get_platdata(codec->dev);
+ 
+ #ifdef CONFIG_HAS_EARLYSUSPEND
+-	early_suspend.level = EARLY_SUSPEND_LEVEL_BLANK_SCREEN;
+-	early_suspend.suspend = tas5707_early_suspend;
+-	early_suspend.resume = tas5707_late_resume;
+-	early_suspend.param = codec;
+-	register_early_suspend(&early_suspend);
++	tas5707->early_suspend.level = EARLY_SUSPEND_LEVEL_BLANK_SCREEN;
++	tas5707->early_suspend.suspend = tas5707_early_suspend;
++	tas5707->early_suspend.resume = tas5707_late_resume;
++	tas5707->early_suspend.param = codec;
++	register_early_suspend(&(tas5707->early_suspend));
+ #endif
+ 
+ 	tas5707->pdata = pdata;
+@@ -516,7 +516,8 @@ static int tas5707_probe(struct snd_soc_codec *codec)
+ static int tas5707_remove(struct snd_soc_codec *codec)
+ {
+ #ifdef CONFIG_HAS_EARLYSUSPEND
+-	unregister_early_suspend(&early_suspend);
++	struct tas5707_priv *tas5707 = snd_soc_codec_get_drvdata(codec);
++	unregister_early_suspend(&(tas5707->early_suspend));
+ #endif
+ 
+ 	return 0;
+@@ -565,33 +566,11 @@ static int tas5707_resume(struct snd_soc_codec *codec)
+ static void tas5707_early_suspend(struct early_suspend *h)
+ {
+ 	return;
+-	/*struct snd_soc_codec *codec = NULL;
+-	struct tas57xx_platform_data *pdata = NULL;
+-
+-	codec = (struct snd_soc_codec *)(h->param);
+-	pdata = dev_get_platdata(codec->dev);
+-
+-	dev_info(codec->dev, "tas5707_early_suspend!\n");
+-	if (pdata && pdata->early_suspend_func)
+-		pdata->early_suspend_func();
+-
+-	snd_soc_write(codec, DDX_MASTER_VOLUME, 0xFF);*/
+ }
+ 
+ static void tas5707_late_resume(struct early_suspend *h)
+ {
+ 	return;
+-	/*struct snd_soc_codec *codec = NULL;
+-	struct tas57xx_platform_data *pdata = NULL;
+-
+-	codec = (struct snd_soc_codec *)(h->param);
+-	pdata = dev_get_platdata(codec->dev);
+-
+-	dev_info(codec->dev, "tas5707_late_resume!\n");
+-	if (pdata && pdata->late_resume_func)
+-		pdata->late_resume_func();
+-
+-	tas5707_set_master_vol(codec);*/
+ }
+ #endif
+ 
+diff --git a/sound/soc/codecs/tas5717.c b/sound/soc/codecs/tas5717.c
+index d51c0c3..cb696a2 100644
+--- a/sound/soc/codecs/tas5717.c
++++ b/sound/soc/codecs/tas5717.c
+@@ -18,8 +18,6 @@
+ 
+ #ifdef CONFIG_HAS_EARLYSUSPEND
+ #include <linux/earlysuspend.h>
+-static struct early_suspend early_suspend;
+-struct task_struct *phone_task;
+ static void tas5717_early_suspend(struct early_suspend *h);
+ static void tas5717_late_resume(struct early_suspend *h);
+ #endif
+@@ -98,6 +96,8 @@ struct tas5717_priv {
+ 	unsigned char Ch1_vol;
+ 	unsigned char Ch2_vol;
+ 	unsigned mclk;
++	struct early_suspend early_suspend;
++	struct task_struct *phone_task;
+ };
+ /*Master Volume*/
+ static int tad5717_mv_16bit_get(struct snd_kcontrol *kcontrol,
+@@ -682,15 +682,15 @@ static int tas5717_init(struct snd_soc_codec *codec)
+ 	}
+ 	/*kthread for phone*/
+ 	if (tas5717->pdata->scan_pin > 0) {
+-		phone_task =
++		tas5717->phone_task =
+ 			kthread_create(phone_thread, codec, "phone_thread");
+-		if (IS_ERR(phone_task)) {
++		if (IS_ERR(tas5717->phone_task)) {
+ 			dev_err(codec->dev, "Unable to start kernel thread./n");
+-			err = PTR_ERR(phone_task);
+-			phone_task = NULL;
++			err = PTR_ERR(tas5717->phone_task);
++			tas5717->phone_task = NULL;
+ 			return err;
+ 		}
+-		wake_up_process(phone_task);
++		wake_up_process(tas5717->phone_task);
+ 	}
+ 	return 0;
+ }
+@@ -702,11 +702,11 @@ static int tas5717_probe(struct snd_soc_codec *codec)
+ 	struct tas57xx_platform_data *pdata = dev_get_platdata(codec->dev);
+ 
+ #ifdef CONFIG_HAS_EARLYSUSPEND
+-	early_suspend.level = EARLY_SUSPEND_LEVEL_BLANK_SCREEN;
+-	early_suspend.suspend = tas5717_early_suspend;
+-	early_suspend.resume = tas5717_late_resume;
+-	early_suspend.param = codec;
+-	register_early_suspend(&early_suspend);
++	tas5717->early_suspend.level = EARLY_SUSPEND_LEVEL_BLANK_SCREEN;
++	tas5717->early_suspend.suspend = tas5717_early_suspend;
++	tas5717->early_suspend.resume = tas5717_late_resume;
++	tas5717->early_suspend.param = codec;
++	register_early_suspend(&(tas5717->early_suspend));
+ #endif
+ 
+ 	tas5717->pdata = pdata;
+@@ -722,12 +722,13 @@ static int tas5717_probe(struct snd_soc_codec *codec)
+ 
+ static int tas5717_remove(struct snd_soc_codec *codec)
+ {
++	struct tas5717_priv *tas5717 = snd_soc_codec_get_drvdata(codec);
+ #ifdef CONFIG_HAS_EARLYSUSPEND
+-	unregister_early_suspend(&early_suspend);
++	unregister_early_suspend(&(tas5717->early_suspend));
+ #endif
+-	if (phone_task) {
+-		kthread_stop(phone_task);
+-		phone_task = NULL;
++	if (tas5717->phone_task) {
++		kthread_stop(tas5717->phone_task);
++		tas5717->phone_task = NULL;
+ 	}
+ 	return 0;
+ }
+@@ -775,33 +776,11 @@ static int tas5717_resume(struct snd_soc_codec *codec)
+ static void tas5717_early_suspend(struct early_suspend *h)
+ {
+ 	return;
+-	/*struct snd_soc_codec *codec = NULL;
+-	struct tas57xx_platform_data *pdata = NULL;
+-
+-	codec = (struct snd_soc_codec *)(h->param);
+-	pdata = dev_get_platdata(codec->dev);
+-
+-	dev_info(codec->dev, "tas5717_early_suspend!\n");
+-	if (pdata && pdata->early_suspend_func)
+-		pdata->early_suspend_func();
+-
+-	snd_soc_write(codec, DDX_MASTER_VOLUME, 0xFF);*/
+ }
+ 
+ static void tas5717_late_resume(struct early_suspend *h)
+ {
+ 	return;
+-	/*struct snd_soc_codec *codec = NULL;
+-	struct tas57xx_platform_data *pdata = NULL;
+-
+-	codec = (struct snd_soc_codec *)(h->param);
+-	pdata = dev_get_platdata(codec->dev);
+-
+-	dev_info(codec->dev, "tas5717_late_resume!\n");
+-	if (pdata && pdata->late_resume_func)
+-		pdata->late_resume_func();
+-
+-	tas5717_set_master_vol(codec);*/
+ }
+ #endif
+ 
+diff --git a/sound/soc/codecs/tas5731.c b/sound/soc/codecs/tas5731.c
+index e5516af..c9ee842 100644
+--- a/sound/soc/codecs/tas5731.c
++++ b/sound/soc/codecs/tas5731.c
+@@ -16,7 +16,6 @@
+ 
+ #ifdef CONFIG_HAS_EARLYSUSPEND
+ #include <linux/earlysuspend.h>
+-static struct early_suspend early_suspend;
+ static void tas5731_early_suspend(struct early_suspend *h);
+ static void tas5731_late_resume(struct early_suspend *h);
+ #endif
+@@ -96,6 +95,7 @@ struct tas5731_priv {
+ 	unsigned char Ch1_vol;
+ 	unsigned char Ch2_vol;
+ 	unsigned mclk;
++	struct early_suspend early_suspend;
+ };
+ 
+ static const DECLARE_TLV_DB_SCALE(mvol_tlv, -12700, 50, 1);
+@@ -560,11 +560,11 @@ static int tas5731_probe(struct snd_soc_codec *codec)
+ 	struct tas57xx_platform_data *pdata = dev_get_platdata(codec->dev);
+ 
+ #ifdef CONFIG_HAS_EARLYSUSPEND
+-	early_suspend.level = EARLY_SUSPEND_LEVEL_BLANK_SCREEN;
+-	early_suspend.suspend = tas5731_early_suspend;
+-	early_suspend.resume = tas5731_late_resume;
+-	early_suspend.param = codec;
+-	register_early_suspend(&early_suspend);
++	tas5731->early_suspend.level = EARLY_SUSPEND_LEVEL_BLANK_SCREEN;
++	tas5731->early_suspend.suspend = tas5731_early_suspend;
++	tas5731->early_suspend.resume = tas5731_late_resume;
++	tas5731->early_suspend.param = codec;
++	register_early_suspend(&(tas5731->early_suspend));
+ #endif
+ 
+ 	tas5731->pdata = pdata;
+@@ -581,7 +581,8 @@ static int tas5731_probe(struct snd_soc_codec *codec)
+ static int tas5731_remove(struct snd_soc_codec *codec)
+ {
+ #ifdef CONFIG_HAS_EARLYSUSPEND
+-	unregister_early_suspend(&early_suspend);
++	struct tas5731_priv *tas5731 = snd_soc_codec_get_drvdata(codec);
++	unregister_early_suspend(&(tas5731->early_suspend));
+ #endif
+ 
+ 	return 0;
+@@ -630,33 +631,11 @@ static int tas5731_resume(struct snd_soc_codec *codec)
+ static void tas5731_early_suspend(struct early_suspend *h)
+ {
+ 	return;
+-	/*struct snd_soc_codec *codec = NULL;
+-	struct tas57xx_platform_data *pdata = NULL;
+-
+-	codec = (struct snd_soc_codec *)(h->param);
+-	pdata = dev_get_platdata(codec->dev);
+-
+-	dev_info(codec->dev, "tas5731_early_suspend!\n");
+-	if (pdata && pdata->early_suspend_func)
+-		pdata->early_suspend_func();
+-
+-	snd_soc_write(codec, DDX_MASTER_VOLUME, 0xFF);*/
+ }
+ 
+ static void tas5731_late_resume(struct early_suspend *h)
+ {
+ 	return;
+-	/*struct snd_soc_codec *codec = NULL;
+-	struct tas57xx_platform_data *pdata = NULL;
+-
+-	codec = (struct snd_soc_codec *)(h->param);
+-	pdata = dev_get_platdata(codec->dev);
+-
+-	dev_info(codec->dev, "tas5731_late_resume!\n");
+-	if (pdata && pdata->late_resume_func)
+-		pdata->late_resume_func();
+-
+-	tas5731_set_master_vol(codec);*/
+ }
+ #endif
+ 
