@@ -15,8 +15,10 @@ LOGO_LIST="$ACE_DIR/ttv-logo.list"
 TMP_LIST="/tmp/tmp-acettv.list"
 
 [ -f $SERVICE_DIR/acettv.conf ] && . $SERVICE_DIR/acettv.conf
+[ -f $SERVICE_DIR/acerun.conf ] && . $SERVICE_DIR/acerun.conf
 
 [ -z "$CAT_ALLFON" ] && CAT_ALLFON="0"
+[ -z "$ACETTV_IP" ] && ACETTV_IP="0"
 
 STAT_OLD=
 if [ -f "$JSON_FILE_GZ" ]; then
@@ -58,7 +60,7 @@ sed '/^$/d' -i $TMP_LIST
 sort -o $TMP_LIST.sort $TMP_LIST
 mv -f $TMP_LIST.sort $TMP_LIST
 
-if [ -f "$ACE_DIR/ttv-m3u/no_ext_ip.conf" ]; then
+if [ "$ACETTV_IP" == "0" ]; then
   URL_IP="127.0.0.1"
 else
   URL_IP=`ifconfig eth0 | awk '/inet addr:/ {print $2}' | sed 's/addr://'`
