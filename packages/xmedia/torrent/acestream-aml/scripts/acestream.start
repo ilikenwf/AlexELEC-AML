@@ -28,9 +28,9 @@ mount -t proc proc $CHROOT_DIR/proc &>/dev/null
 mount -t sysfs sysfs $CHROOT_DIR/sys &>/dev/null
 
 mkdir -p $ETC_DIR
-cat /run/connman/hosts > $ETC_DIR/hosts
-cat /run/connman/resolv.conf > $ETC_DIR/resolv.conf
-cat /proc/sys/kernel/hostname > $ETC_DIR/hostname
+[ ! -f $ETC_DIR/hosts ] && cp -f /run/connman/hosts $ETC_DIR/hosts
+[ ! -f $ETC_DIR/hostname ] && cp -f /proc/sys/kernel/hostname $ETC_DIR/hostname
+[ ! -f $ETC_DIR/resolv.conf ] && cp -f /run/connman/resolv.conf $ETC_DIR/resolv.conf
 
 MOUNT_DISK="none"
 IS_MOUNT_SD=$(/bin/mount | grep '/dev/mmcblk.* on /var/media')
