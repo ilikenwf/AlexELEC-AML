@@ -1,0 +1,13 @@
+diff --git a/sound/soc/codecs/es8323.c b/sound/soc/codecs/es8323.c
+index 80d361d..c08816f 100644
+--- a/sound/soc/codecs/es8323.c
++++ b/sound/soc/codecs/es8323.c
+@@ -59,7 +59,7 @@ struct es8323_priv {
+  * Debug
+  */
+ 
+-#define ES8323_DEBUG 1
++// #define ES8323_DEBUG 1
+ 
+ #ifdef ES8323_DEBUG
+ #define alsa_dbg(format, arg...) \
