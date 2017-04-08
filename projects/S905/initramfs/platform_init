@@ -95,5 +95,5 @@ echo 4 > /proc/irq/62/smp_affinity   # dwc_otg, dwc_otg_hcd:usb2
 echo 98304 > /proc/sys/vm/extra_free_kbytes
 echo 400 > /proc/sys/vm/vfs_cache_pressure
 
-# Enable FRA (Nougat kernel)
-echo 1 > /sys/class/amhdmitx/amhdmitx0/frac_rate_policy
+# DEC_CONTROL_FLAG_DISABLE_FAST_POC
+echo 4 > /sys/module/amvdec_h264/parameters/dec_control
