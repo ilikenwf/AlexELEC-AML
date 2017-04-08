@@ -1,0 +1,24 @@
+diff -Naurp linux-d785aef/drivers/amlogic/amports/vh264.c linux-d785aef-patch/drivers/amlogic/amports/vh264.c
+--- linux-d785aef/drivers/amlogic/amports/vh264.c	2017-04-07 07:59:52.000000000 +0300
++++ linux-d785aef-patch/drivers/amlogic/amports/vh264.c	2017-04-08 13:32:02.000000000 +0300
+@@ -254,7 +254,7 @@ static bool check_pts_discontinue;
+ static u32 wait_buffer_counter;
+ static u32 video_signal_from_vui;
+ 
+-static uint error_recovery_mode;
++static uint error_recovery_mode = 1;
+ static uint error_recovery_mode_in = 3;
+ static uint error_recovery_mode_use = 3;
+ 
+diff -Naurp linux-d785aef/drivers/amlogic/amports/vh264_4k2k.c linux-d785aef-patch/drivers/amlogic/amports/vh264_4k2k.c
+--- linux-d785aef/drivers/amlogic/amports/vh264_4k2k.c	2017-04-07 07:59:52.000000000 +0300
++++ linux-d785aef-patch/drivers/amlogic/amports/vh264_4k2k.c	2017-04-08 13:32:02.000000000 +0300
+@@ -100,7 +100,7 @@ static u32 saved_resolution;
+ static struct timer_list recycle_timer;
+ static u32 stat;
+ static u32 error_watchdog_count;
+-static uint error_recovery_mode;
++static uint error_recovery_mode = 1;
+ static u32 sync_outside;
+ static u32 vh264_4k2k_rotation;
+ static u32 first_i_recieved;
