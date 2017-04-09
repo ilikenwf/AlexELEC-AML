@@ -1,0 +1,32 @@
+diff --git a/sound/soc/aml/m8/aml_spdif_codec.c b/sound/soc/aml/m8/aml_spdif_codec.c
+index 0a2b472..ac76ef6 100644
+--- a/sound/soc/aml/m8/aml_spdif_codec.c
++++ b/sound/soc/aml/m8/aml_spdif_codec.c
+@@ -26,8 +26,9 @@
+ 
+ #define DRV_NAME "spdif-dit"
+ 
+-#define STUB_RATES	SNDRV_PCM_RATE_32000 | SNDRV_PCM_RATE_44100 | SNDRV_PCM_RATE_48000 | SNDRV_PCM_RATE_88200 | SNDRV_PCM_RATE_96000 | SNDRV_PCM_RATE_176400 | SNDRV_PCM_RATE_192000
+-#define STUB_FORMATS	SNDRV_PCM_FMTBIT_S16_LE
++#define STUB_RATES	SNDRV_PCM_RATE_8000_192000
++#define STUB_FORMATS	(SNDRV_PCM_FMTBIT_S16_LE | \
++	SNDRV_PCM_FMTBIT_S24_LE | SNDRV_PCM_FMTBIT_S32_LE)
+ 
+ struct pinctrl *pin_spdif_ctl;
+ struct device *spdif_dev;
+diff --git a/sound/soc/codecs/dummy_codec.c b/sound/soc/codecs/dummy_codec.c
+index f933384..0696213 100644
+--- a/sound/soc/codecs/dummy_codec.c
++++ b/sound/soc/codecs/dummy_codec.c
+@@ -16,8 +16,9 @@ struct dummy_codec_private {
+ 	struct snd_soc_codec codec;
+ };
+ 
+-#define DUMMY_CODEC_RATES		(SNDRV_PCM_RATE_32000 | SNDRV_PCM_RATE_44100 | SNDRV_PCM_RATE_48000 | SNDRV_PCM_RATE_88200 | SNDRV_PCM_RATE_96000 | SNDRV_PCM_RATE_176400 | SNDRV_PCM_RATE_192000)
+-#define DUMMY_CODEC_FORMATS		SNDRV_PCM_FMTBIT_S32_LE
++#define DUMMY_CODEC_RATES		(SNDRV_PCM_RATE_8000_192000)
++#define DUMMY_CODEC_FORMATS		(SNDRV_PCM_FMTBIT_S16_LE |\
++		SNDRV_PCM_FMTBIT_S24_LE | SNDRV_PCM_FMTBIT_S32_LE)
+ 
+ static int dummy_codec_pcm_hw_params(struct snd_pcm_substream *substream,
+ 				     struct snd_pcm_hw_params *params,

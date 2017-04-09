@@ -4,7 +4,7 @@
 ################################################################################
 
 PKG_NAME="media_build"
-PKG_VERSION="3c6ce4f"
+PKG_VERSION="0d47a85"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"

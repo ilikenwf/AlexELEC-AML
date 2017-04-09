@@ -7,6 +7,7 @@
 SERVICE_DIR="/storage/.cache/services"
 M3U_DIR="/storage/ttv-m3u"
 ACE_M3U="$M3U_DIR/AceLive-TTV.m3u"
+ACE_M3U_DIRECT="$M3U_DIR/AceLive-TTV-Direct.m3u"
 ACE_DIR="/storage/.config/acestream"
 JSON_FILE="$ACE_DIR/ttv-m3u/acelive.json"
 JSON_FILE_GZ="$JSON_FILE.gz"
@@ -14,8 +15,10 @@ LOGO_LIST="$ACE_DIR/ttv-logo.list"
 TMP_LIST="/tmp/tmp-acettv.list"
 
 [ -f $SERVICE_DIR/acettv.conf ] && . $SERVICE_DIR/acettv.conf
+[ -f $SERVICE_DIR/acerun.conf ] && . $SERVICE_DIR/acerun.conf
 
 [ -z "$CAT_ALLFON" ] && CAT_ALLFON="0"
+[ -z "$ACETTV_IP" ] && ACETTV_IP="0"
 
 STAT_OLD=
 if [ -f "$JSON_FILE_GZ" ]; then
@@ -23,7 +26,7 @@ if [ -f "$JSON_FILE_GZ" ]; then
 fi
 
 mkdir -p $ACE_DIR/ttv-m3u
-curl -s -R -z "$JSON_FILE_GZ" -o "$JSON_FILE_GZ" -H "Accept-Encoding: gzip" "http://super-pomoyka.us.to/trash/ttv-list/acelive.json"
+curl -s --connect-timeout 5 --max-time 20 -R -z "$JSON_FILE_GZ" -o "$JSON_FILE_GZ" -H "Accept-Encoding: gzip" "http://super-pomoyka.us.to/trash/ttv-list/acelive.json"
 
 if [ ! -f "$JSON_FILE_GZ" ]; then
   echo "Error! Could not load json-file."
@@ -37,7 +40,7 @@ if [ "$STAT_OLD" == "$STAT_NEW" ]; then
 fi
 
 gunzip -c "$JSON_FILE_GZ" > "$JSON_FILE"
-/usr/bin/jq -r '.[] | .cat + " # " + .name + " # " + .fname' $JSON_FILE > $TMP_LIST
+/usr/bin/jq -r '.[] | .cat + " # " + .name + " # " + .fname + " # " + .cid' $JSON_FILE > $TMP_LIST
 
 [ "$CAT_SHOW" == 0 ] && sed "s|^Развлекательные.*||g" -i $TMP_LIST
 [ "$CAT_COMM" == 0 ] && sed "s|^Общие.*||g" -i $TMP_LIST
@@ -57,24 +60,32 @@ sed '/^$/d' -i $TMP_LIST
 sort -o $TMP_LIST.sort $TMP_LIST
 mv -f $TMP_LIST.sort $TMP_LIST
 
-URL_IP=`ifconfig eth0 | awk '/inet addr:/ {print $2}' | sed 's/addr://'`
-if [ -z $URL_IP ]; then
-  URL_IP=`ifconfig wlan0 | awk '/inet addr:/ {print $2}' | sed 's/addr://'`
-  [ -z $URL_IP ] && URL_IP="127.0.0.1"
+if [ "$ACETTV_IP" == "0" ]; then
+  URL_IP="127.0.0.1"
+else
+  URL_IP=`ifconfig eth0 | awk '/inet addr:/ {print $2}' | sed 's/addr://'`
+  if [ -z $URL_IP ]; then
+    URL_IP=`ifconfig wlan0 | awk '/inet addr:/ {print $2}' | sed 's/addr://'`
+    [ -z $URL_IP ] && URL_IP="127.0.0.1"
+  fi
 fi
 
 mkdir -p $M3U_DIR
 echo '#EXTM3U' > $ACE_M3U
+echo '#EXTM3U' > $ACE_M3U_DIRECT
 
 cat $TMP_LIST |  
     while read -r LINE ; do
       CH_CAT=`echo $LINE | awk -F\\# '{print $1}' | sed 's/^[ \t]*//; s/[ \t]*$//'`
       CH_NAME=`echo $LINE | awk -F\\# '{print $2}' | sed 's/^[ \t]*//; s/[ \t]*$//'`
       CH_PATH=`echo $LINE | awk -F\\# '{print $3}' | sed 's/^[ \t]*//; s/[ \t]*$//'`
+      CH_CID=`echo $LINE | awk -F\\# '{print $4}' | sed 's/^[ \t]*//; s/[ \t]*$//'`
       CH_LOGO=`grep -i -m 1 "$CH_NAME #" $LOGO_LIST | awk -F\\# '{print $2}' | sed 's/^[ \t]*//; s/[ \t]*$//'`
 
       echo "#EXTINF:-1 group-title=\"$CH_CAT\" tvg-name=\"$CH_NAME\" tvg-logo=\"$CH_LOGO\",$CH_NAME" >> $ACE_M3U
+      echo "#EXTINF:-1 group-title=\"$CH_CAT\" tvg-name=\"$CH_NAME\" tvg-logo=\"$CH_LOGO\",$CH_NAME" >> $ACE_M3U_DIRECT
       echo "http://${URL_IP}:6878/ace/getstream?url=http%3A%2F%2Fsuper-pomoyka.us.to%2Ftrash%2Fttv-list%2Facelive%2F${CH_PATH}&.mp4" >> $ACE_M3U
+      echo "http://${URL_IP}:6878/ace/getstream?id=${CH_CID}&.mp4" >> $ACE_M3U_DIRECT
     done
 
 echo "Done! Playlist created."

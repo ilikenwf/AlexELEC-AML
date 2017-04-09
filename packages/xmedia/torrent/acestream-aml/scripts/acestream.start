@@ -8,6 +8,7 @@ SERVICE_DIR="/storage/.cache/services"
 CHROOT_DIR="/storage/.config/acestream"
 LOG_FILE="/var/log/acestream.log"
 MOUNT_STATE="$CHROOT_DIR/disk.mount"
+ETC_DIR="$CHROOT_DIR/system/etc"
 
 rm -f $MOUNT_STATE
 
@@ -25,6 +26,11 @@ mkdir -p $CHROOT_DIR/media
 mount -o bind /dev $CHROOT_DIR/dev &>/dev/null
 mount -t proc proc $CHROOT_DIR/proc &>/dev/null
 mount -t sysfs sysfs $CHROOT_DIR/sys &>/dev/null
+
+mkdir -p $ETC_DIR
+[ ! -f $ETC_DIR/hosts ] && cp -f /run/connman/hosts $ETC_DIR/hosts
+[ ! -f $ETC_DIR/hostname ] && cp -f /proc/sys/kernel/hostname $ETC_DIR/hostname
+[ ! -f $ETC_DIR/resolv.conf ] && cp -f /run/connman/resolv.conf $ETC_DIR/resolv.conf
 
 MOUNT_DISK="none"
 IS_MOUNT_SD=$(/bin/mount | grep '/dev/mmcblk.* on /var/media')

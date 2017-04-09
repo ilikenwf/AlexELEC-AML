@@ -4,7 +4,7 @@
 ################################################################################
 
 PKG_NAME="timezone-data"
-PKG_VERSION="2017a"
+PKG_VERSION="2017b"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="Public Domain"

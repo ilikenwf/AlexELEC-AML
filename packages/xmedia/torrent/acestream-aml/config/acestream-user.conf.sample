@@ -9,9 +9,11 @@
 
 # cache in memory
 ACE_USER_ARG="--live-cache-type memory \
-              --live-buffer 60 \
+              --live-buffer 30 \
               --live-cache-size 20971520 \
-              --cache-limit 10 \
+              --cache-limit 5 \
+              --bind-all \
+              --access-token alexelec \
               --login LOGIN \
               --password PASSWORD"
 
@@ -21,5 +23,7 @@ ACE_USER_ARG="--live-cache-type disk \
               --cache-limit 10 \
               --max-file-size 5368709120 \
               --live-disk-cache-size 8589934592 \
+              --bind-all \
+              --access-token alexelec \
               --login LOGIN \
               --password PASSWORD"

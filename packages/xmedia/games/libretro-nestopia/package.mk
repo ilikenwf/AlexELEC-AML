@@ -4,7 +4,7 @@
 ################################################################################
 
 PKG_NAME="libretro-nestopia"
-PKG_VERSION="70f4705"
+PKG_VERSION="1e31779"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
@@ -17,9 +17,11 @@ PKG_SHORTDESC="Libretro implementation of NEStopia. (Nintendo Entertainment Syst
 PKG_LONGDESC="This project is a fork of the original Nestopia source code, plus the Linux port. The purpose of the project is to enhance the original, and ensure it continues to work on modern operating systems."
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
+PKG_USE_CMAKE="no"
 
 make_target() {
-  make -C libretro
+  cd $ROOT/$PKG_BUILD
+    make -C libretro
 }
 
 makeinstall_target() {
