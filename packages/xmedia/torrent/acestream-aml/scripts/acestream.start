@@ -11,6 +11,7 @@ MOUNT_STATE="$CHROOT_DIR/disk.mount"
 ETC_DIR="$CHROOT_DIR/system/etc"
 
 rm -f $MOUNT_STATE
+mkdir -p $CHROOT_DIR/system/data/data/org.acestream.engine/files/.ACEStream
 
 [ -f $SERVICE_DIR/acestream.conf ] && . $SERVICE_DIR/acestream.conf
 
