@@ -35,5 +35,8 @@ mkpkg-temp
 # clean files
 /clean_*
 
+# current build pkg info
+/.current.build.pkg
+
 # other
 /projects/S905/packages/32bit-libs/sources/*
