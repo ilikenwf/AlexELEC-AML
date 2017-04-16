@@ -21,7 +21,11 @@ post_install() {
   if [ -n "$DEVICE" -a -d "$PROJECT_DIR/$PROJECT/devices/$DEVICE/filesystem" ]; then
     cp -LR $PROJECT_DIR/$PROJECT/devices/$DEVICE/filesystem/* $ROOT/$BUILD/image/system
   fi
-  if [ -e "$PROJECT_DIR/$PROJECT/install/files/logo.img" ]; then
+
+  if [ -n "$DEVICE" -a -e "$PROJECT_DIR/$PROJECT/devices/$DEVICE/install/files/logo.img" ]; then
+    mkdir -p $ROOT/$BUILD/image/system/usr/share/bootloader
+    cp -f $PROJECT_DIR/$PROJECT/devices/$DEVICE/install/files/logo.img $ROOT/$BUILD/image/system/usr/share/bootloader
+  elif [ -e "$PROJECT_DIR/$PROJECT/install/files/logo.img" ]; then
     mkdir -p $ROOT/$BUILD/image/system/usr/share/bootloader
     cp -f $PROJECT_DIR/$PROJECT/install/files/logo.img $ROOT/$BUILD/image/system/usr/share/bootloader
   fi

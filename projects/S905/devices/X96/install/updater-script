@@ -27,9 +27,6 @@ write_raw_image(package_extract_file("recovery.img"), "recovery");
 
 show_progress(0.018000, 0);
 
-ui_print("Writing bootloader");
-write_raw_image(package_extract_file("bootloader.img"), "bootloader");
-
 set_bootloader_env("upgrade_step", "2");
 set_bootloader_env("force_auto_update", "false");
 show_progress(0.100000, 0);
