@@ -29,6 +29,7 @@ post_install() {
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET acephproxy"
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET transmission"
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET minidlna"
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET noxbit"
 
 # tv services
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET vdr-all wicard tvheadend"
