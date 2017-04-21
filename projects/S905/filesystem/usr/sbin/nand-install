@@ -36,11 +36,9 @@ install_to_nand() {
 
     mount -o rw,remount /flash
 
-    read -p "Backup NAND to SD card? [Y/n] " choice
+    read -p "Backup NAND to SD card? [N/y] " choice
     case "$choice" in
-      [nN]*)
-        ;;
-      *)
+      [yY]*)
         if [ -e /dev/dtb ] ; then
           echo -n "Backing up device tree..."
           dd if="/dev/dtb" of="/flash/dtb-$BACKUP_DATE.img" status=none && sync
@@ -58,6 +56,8 @@ install_to_nand() {
           dd if="/dev/logo" of="/flash/logo-$BACKUP_DATE.img" status=none && sync
           echo "done."
         fi
+        ;;
+      *)
         ;;
     esac
 

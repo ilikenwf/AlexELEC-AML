@@ -1,6 +1,7 @@
 [Unit]
 Description=GUI switch service
 Before=kodi.service
+After=var.mount
 
 [Service]
 Type=oneshot

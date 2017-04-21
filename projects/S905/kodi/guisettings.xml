@@ -1,0 +1,83 @@
+<settings>
+    <audiooutput>
+        <ac3passthrough default="true">true</ac3passthrough>
+        <ac3transcode default="true">false</ac3transcode>
+        <atempothreshold default="true">2</atempothreshold>
+        <audiodevice>ALSA:hdmi:CARD=AMLM8AUDIO,DEV=0</audiodevice>
+        <boostcenter default="true">0</boostcenter>
+        <channels default="true">1</channels>
+        <config default="true">2</config>
+        <dspaddonsenabled default="true">false</dspaddonsenabled>
+        <dtshdpassthrough default="true">false</dtshdpassthrough>
+        <dtspassthrough default="true">false</dtspassthrough>
+        <eac3passthrough default="true">false</eac3passthrough>
+        <guisoundmode default="true">1</guisoundmode>
+        <maintainoriginalvolume default="true">true</maintainoriginalvolume>
+        <passthrough default="true">false</passthrough>
+        <passthroughdevice default="true">ALSA:hdmi:CARD=AMLM8AUDIO,DEV=0</passthroughdevice>
+        <processquality default="true">30</processquality>
+        <samplerate default="true">48000</samplerate>
+        <stereoupmix default="true">false</stereoupmix>
+        <streamnoise default="true">false</streamnoise>
+        <streamsilence default="true">1</streamsilence>
+        <truehdpassthrough default="true">false</truehdpassthrough>
+        <volumesteps default="true">60</volumesteps>
+    </audiooutput>
+    <debug>
+        <screenshotpath pathversion="1">/storage/screenshots/</screenshotpath>
+    </debug>
+    <general>
+        <settinglevel>3</settinglevel>
+    </general>
+    <locale>
+        <audiolanguage default="true">original</audiolanguage>
+        <charset default="true">DEFAULT</charset>
+        <country default="true">Russia</country>
+        <keyboardlayouts default="true">English QWERTY|Russian ЙЦУКЕН</keyboardlayouts>
+        <language default="true">resource.language.ru_ru</language>
+        <longdateformat default="true">regional</longdateformat>
+        <shortdateformat default="true">regional</shortdateformat>
+        <speedunit default="true">regional</speedunit>
+        <subtitlelanguage default="true">original</subtitlelanguage>
+        <temperatureunit default="true">regional</temperatureunit>
+        <timeformat default="true">regional</timeformat>
+        <timezone>Europe/Kiev</timezone>
+        <timezonecountry>Ukraine</timezonecountry>
+        <use24hourclock default="true">regional</use24hourclock>
+    </locale>
+    <lookandfeel>
+        <enablerssfeeds>true</enablerssfeeds>
+        <font default="true">Default</font>
+        <rssedit default="true"></rssedit>
+        <skin default="true">skin.estuary</skin>
+        <skincolors default="true">SKINDEFAULT</skincolors>
+        <skintheme default="true">SKINDEFAULT</skintheme>
+        <skinzoom default="true">0</skinzoom>
+        <soundskin default="true">resource.uisounds.kodi</soundskin>
+        <startupwindow default="true">10000</startupwindow>
+        <stereostrength default="true">5</stereostrength>
+    </lookandfeel>
+    <pvrplayback>
+        <channelentrytimeout default="true">0</channelentrytimeout>
+        <confirmchannelswitch default="true">false</confirmchannelswitch>
+        <enableradiords>false</enableradiords>
+        <fps default="true">0</fps>
+        <playminimized>true</playminimized>
+        <scantime default="true">10</scantime>
+        <signalquality>true</signalquality>
+        <startlast default="true">0</startlast>
+        <trafficadvisory default="true">false</trafficadvisory>
+        <trafficadvisoryvolume default="true">10</trafficadvisoryvolume>
+    </pvrplayback>
+    <videoplayer>
+        <autoplaynextitem>false</autoplaynextitem>
+    </videoplayer>
+    <weather>
+        <addon>weather.openweathermap.extended</addon>
+        <currentlocation default="true">1</currentlocation>
+    </weather>
+    <audio>
+        <mute>false</mute>
+        <fvolumelevel>0.500000</fvolumelevel>
+    </audio>
+</settings>
