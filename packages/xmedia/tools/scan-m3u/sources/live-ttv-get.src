@@ -29,6 +29,12 @@ STAT_OLD=
 [ -z "$CAT_ALLFON" ] && CAT_ALLFON="0"
 [ -z "$TTV_SOFT" ] && TTV_SOFT="AceStream"
 
+del_cat () {
+  CAT=$1
+  cat $NOX_FILE | sed -n "p; /$CAT/n" | sed "/$CAT/d" > $NOX_M3U
+  cp -f $NOX_M3U $NOX_FILE
+}
+
 if [ "$ACETTV_IP" == "0" ]; then
   URL_IP="127.0.0.1"
 else
@@ -119,56 +125,22 @@ else
   fi
 
   gunzip -c "$NOX_FILE_GZ" > "$NOX_FILE"
-  sed '/#EXTM3U/d' -i $NOX_FILE
-
-  [ "$CAT_SHOW" == 0 ] && sed "s|^#EXTGRP:Развлекательные.*||g" -i $NOX_FILE
-  [ "$CAT_COMM" == 0 ] && sed "s|^#EXTGRP:Общие.*||g" -i $NOX_FILE
-  [ "$CAT_FILMS" == 0 ] && sed "s|^#EXTGRP:Фильмы.*||g" -i $NOX_FILE
-  [ "$CAT_EROS" == 0 ] && sed "s|^#EXTGRP:Эротика.*||g" -i $NOX_FILE
-  [ "$CAT_NEWS" == 0 ] && sed "s|^#EXTGRP:Новостные.*||g" -i $NOX_FILE
-  [ "$CAT_REGION" == 0 ] && sed "s|^#EXTGRP:Региональные.*||g" -i $NOX_FILE
-  [ "$CAT_MUSIC" == 0 ] && sed "s|^#EXTGRP:Музыка.*||g" -i $NOX_FILE
-  [ "$CAT_CHILDREN" == 0 ] && sed "s|^#EXTGRP:Детские.*||g" -i $NOX_FILE
-  [ "$CAT_SPORT" == 0 ] && sed "s|^#EXTGRP:Спорт.*||g" -i $NOX_FILE
-  [ "$CAT_RELIGION" == 0 ] && sed "s|^#EXTGRP:Религиозные.*||g" -i $NOX_FILE
-  [ "$CAT_MAN" == 0 ] && sed "s|^#EXTGRP:Мужские.*||g" -i $NOX_FILE
-  [ "$CAT_LEARN" == 0 ] && sed "s|^#EXTGRP:Познавательные.*||g" -i $NOX_FILE
-
   mkdir -p $M3U_DIR
-  echo '#EXTM3U' > $NOX_M3U
 
-  cat $NOX_FILE |  
-    while read -r LINE ; do
-      echo $LINE | grep '^#EXTINF' > /dev/null 2>&1
-      if [ $? -eq 0 ]; then
-        CH_LOGO=`echo $LINE | awk '{print $2}' | sed 's/,.*//; s/tvg-logo=//; s/[ \t]*$//'`
-        CH_NAME=`echo $LINE | awk -F\\, '{print $2}' | sed 's/(на модерации)//; s/^[ \t]*//; s/[ \t]*$//'`
-        CH_CAT=
-        CH_CID=
-        continue
-      fi
+  [ "$CAT_SHOW" == 0 ] && del_cat "Развлекательные"
+  [ "$CAT_COMM" == 0 ] && del_cat "Общие"
+  [ "$CAT_FILMS" == 0 ] && del_cat "Фильмы"
+  [ "$CAT_EROS" == 0 ] && del_cat "Эротика"
+  [ "$CAT_NEWS" == 0 ] && del_cat "Новостные"
+  [ "$CAT_REGION" == 0 ] && del_cat "Региональные"
+  [ "$CAT_MUSIC" == 0 ] && del_cat "Музыка"
+  [ "$CAT_CHILDREN" == 0 ] && del_cat "Детские"
+  [ "$CAT_SPORT" == 0 ] && del_cat "Спорт"
+  [ "$CAT_RELIGION" == 0 ] && del_cat "Религиозные"
+  [ "$CAT_MAN" == 0 ] && del_cat "Мужские"
+  [ "$CAT_LEARN" == 0 ] && del_cat "Познавательные"
 
-      echo $LINE | grep '^#EXTGRP' > /dev/null 2>&1
-      if [ $? -eq 0 ]; then
-        CH_CAT=`echo $LINE | awk -F\\: '{print $2}' | sed 's/^[ \t]*//; s/[ \t]*$//'`
-        CH_CID=
-        continue
-      fi
-
-      echo $LINE | grep '^http' > /dev/null 2>&1
-      if [ $? -eq 0 ]; then
-        CH_CID=`echo $LINE | awk -F\\= '{print $2}' | sed 's/^[ \t]*//; s/[ \t]*$//'`
-      fi
-
-      if [ -n "$CH_LOGO" -a -n "$CH_NAME" -a -n "$CH_CAT" -a -n "$CH_CID" ]; then
-        echo "#EXTINF:-1 group-title=\"$CH_CAT\" tvg-name=\"$CH_NAME\" tvg-logo=$CH_LOGO,$CH_NAME" >> $NOX_M3U
-        echo "http://${URL_IP}:6689/stream?cid=${CH_CID}" >> $NOX_M3U
-        CH_LOGO=
-        CH_NAME=
-        CH_CAT=
-        CH_CID=
-      fi
-    done
+  [ "$ACETTV_IP" == "1" ] && sed "s|127\.0\.0\.1|$URL_IP|g" -i $NOX_M3U
 
 fi
 
