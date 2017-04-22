@@ -62,8 +62,10 @@ if [ "$TTV_SOFT" == "AceStream" ]; then
 
   STAT_NEW=`stat $JSON_FILE_GZ | grep 'Modify:'`
   if [ "$STAT_OLD" == "$STAT_NEW" ]; then
-    echo "Done! You already actual playlist."
-    exit
+    if [ -f "$ACE_M3U" -a -f "$ACE_M3U_DIRECT" ]; then
+      echo "You already actual playlist."
+      exit
+    fi
   fi
 
   gunzip -c "$JSON_FILE_GZ" > "$JSON_FILE"
