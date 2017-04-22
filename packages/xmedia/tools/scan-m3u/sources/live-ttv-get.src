@@ -69,19 +69,19 @@ if [ "$TTV_SOFT" == "AceStream" ]; then
   gunzip -c "$JSON_FILE_GZ" > "$JSON_FILE"
   /usr/bin/jq -r '.[] | .cat + " # " + .name + " # " + .fname + " # " + .cid' $JSON_FILE > $TMP_LIST
 
-  [ "$CAT_SHOW" == 0 ] && sed "s|^Развлекательные.*||g" -i $TMP_LIST
-  [ "$CAT_COMM" == 0 ] && sed "s|^Общие.*||g" -i $TMP_LIST
-  [ "$CAT_FILMS" == 0 ] && sed "s|^Фильмы.*||g" -i $TMP_LIST
-  [ "$CAT_EROS" == 0 ] && sed "s|^Эротика.*||g" -i $TMP_LIST
-  [ "$CAT_NEWS" == 0 ] && sed "s|^Новостные.*||g" -i $TMP_LIST
-  [ "$CAT_REGION" == 0 ] && sed "s|^Региональные.*||g" -i $TMP_LIST
-  [ "$CAT_MUSIC" == 0 ] && sed "s|^Музыка.*||g" -i $TMP_LIST
-  [ "$CAT_CHILDREN" == 0 ] && sed "s|^Детские.*||g" -i $TMP_LIST
-  [ "$CAT_SPORT" == 0 ] && sed "s|^Спорт.*||g" -i $TMP_LIST
-  [ "$CAT_RELIGION" == 0 ] && sed "s|^Религиозные.*||g" -i $TMP_LIST
-  [ "$CAT_MAN" == 0 ] && sed "s|^Мужские.*||g" -i $TMP_LIST
-  [ "$CAT_LEARN" == 0 ] && sed "s|^Познавательные.*||g" -i $TMP_LIST
-  [ "$CAT_ALLFON" == 0 ] && sed "s|^allfon.*||g" -i $TMP_LIST
+  [ "$CAT_SHOW" == 0 ] && sed '/^Развлекательные/d' -i $TMP_LIST
+  [ "$CAT_COMM" == 0 ] && sed '/^Общие/d' -i $TMP_LIST
+  [ "$CAT_FILMS" == 0 ] && sed '/^Фильмы/d' -i $TMP_LIST
+  [ "$CAT_EROS" == 0 ] && sed '/^Эротика/d' -i $TMP_LIST
+  [ "$CAT_NEWS" == 0 ] && sed '/^Новостные/d' -i $TMP_LIST
+  [ "$CAT_REGION" == 0 ] && sed '/^Региональные/d' -i $TMP_LIST
+  [ "$CAT_MUSIC" == 0 ] && sed '/^Музыка/d' -i $TMP_LIST
+  [ "$CAT_CHILDREN" == 0 ] && sed '/^Детские/d' -i $TMP_LIST
+  [ "$CAT_SPORT" == 0 ] && sed '/^Спорт/d' -i $TMP_LIST
+  [ "$CAT_RELIGION" == 0 ] && sed '/^Религиозные/d' -i $TMP_LIST
+  [ "$CAT_MAN" == 0 ] && sed '/^Мужские/d' -i $TMP_LIST
+  [ "$CAT_LEARN" == 0 ] && sed '/^Познавательные/d' -i $TMP_LIST
+  [ "$CAT_ALLFON" == 0 ] && sed '/^allfon/d' -i $TMP_LIST
 
   sed '/^$/d' -i $TMP_LIST
   sort -o $TMP_LIST.sort $TMP_LIST
