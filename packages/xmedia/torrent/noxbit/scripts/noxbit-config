@@ -12,7 +12,7 @@ CONFIG_DIR="/storage/.config/noxbit"
 [ -z $NOX_DEL ] && NOX_DEL="1"
 [ -z $NOX_UID ] && NOX_UID="none"
 [ -z $NOX_PAS ] && NOX_PAS="none"
-[ -z $NOX_DIR ] && NOX_DIR="/storage/.noxbit"
+[ -z $NOX_DIR ] && NOX_DIR="/tmp/noxbit"
 
 mkdir -p $NOX_DIR
 
