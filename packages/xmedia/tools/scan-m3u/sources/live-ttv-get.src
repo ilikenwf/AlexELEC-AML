@@ -20,33 +20,25 @@ JSON_FILE="$ACE_DIR/ttv-m3u/acelive.json"
 JSON_FILE_GZ="$JSON_FILE.gz"
 LOGO_LIST="$ACE_DIR/ttv-logo.list"
 TMP_LIST="/tmp/tmp-acettv.list"
-STAT_OLD=
+RUN_STATUS=
 
 [ -f $SERVICE_DIR/acettv.conf ] && . $SERVICE_DIR/acettv.conf
 [ -f $SERVICE_DIR/acerun.conf ] && . $SERVICE_DIR/acerun.conf
 
 [ -z "$ACETTV_IP" ] && ACETTV_IP="0"
 [ -z "$CAT_ALLFON" ] && CAT_ALLFON="0"
-[ -z "$TTV_SOFT" ] && TTV_SOFT="AceStream"
+[ -z "$TTV_SOFT" ] && TTV_SOFT="All"
 
+# clean Nox categories
 del_cat () {
   CAT=$1
   cat $NOX_FILE | sed -n "p; /$CAT/n" | sed "/$CAT/d" > $NOX_M3U
   cp -f $NOX_M3U $NOX_FILE
 }
 
-if [ "$ACETTV_IP" == "0" ]; then
-  URL_IP="127.0.0.1"
-else
-  URL_IP=`ifconfig eth0 | awk '/inet addr:/ {print $2}' | sed 's/addr://'`
-  if [ -z $URL_IP ]; then
-    URL_IP=`ifconfig wlan0 | awk '/inet addr:/ {print $2}' | sed 's/addr://'`
-    [ -z $URL_IP ] && URL_IP="127.0.0.1"
-  fi
-fi
-
-if [ "$TTV_SOFT" == "AceStream" ]; then
-
+# AceStream start
+ace_run () {
+  STAT_OLD=
   mkdir -p $ACE_DIR/ttv-m3u
 
   if [ -f "$JSON_FILE_GZ" ]; then
@@ -56,15 +48,25 @@ if [ "$TTV_SOFT" == "AceStream" ]; then
   curl -s --connect-timeout 5 --max-time 20 -R -z "$JSON_FILE_GZ" -o "$JSON_FILE_GZ" -H "Accept-Encoding: gzip" "http://super-pomoyka.us.to/trash/ttv-list/acelive.json"
 
   if [ ! -f "$JSON_FILE_GZ" ]; then
-    echo "Error! Could not load json-file."
-    exit
+    if [ "$1" == "next" ]; then
+      RUN_STATUS="AceStream: Could not load json-file."
+      return
+    else
+      echo "AceStream: Could not load json-file."
+      exit
+    fi
   fi
 
   STAT_NEW=`stat $JSON_FILE_GZ | grep 'Modify:'`
   if [ "$STAT_OLD" == "$STAT_NEW" ]; then
     if [ -f "$ACE_M3U" -a -f "$ACE_M3U_DIRECT" ]; then
-      echo "You already actual playlist."
-      exit
+      if [ "$1" == "next" ]; then
+        RUN_STATUS="AceStream: You already actual playlist."
+        return
+      else
+        echo "AceStream: You already actual playlist."
+        exit
+      fi
     fi
   fi
 
@@ -89,7 +91,6 @@ if [ "$TTV_SOFT" == "AceStream" ]; then
   sort -o $TMP_LIST.sort $TMP_LIST
   mv -f $TMP_LIST.sort $TMP_LIST
 
-  mkdir -p $M3U_DIR
   echo '#EXTM3U' > $ACE_M3U
   echo '#EXTM3U' > $ACE_M3U_DIRECT
 
@@ -107,12 +108,19 @@ if [ "$TTV_SOFT" == "AceStream" ]; then
       echo "http://${URL_IP}:6878/ace/getstream?id=${CH_CID}&.mp4" >> $ACE_M3U_DIRECT
     done
 
-else
+  [ "$1" == "next" ] && RUN_STATUS="Done! Playlist created."
+}
 
+# Noxbit start
+nox_run () {
   [ -f $NOX_DIR/playlist.conf ] && . $NOX_DIR/playlist.conf
 
   if [ -z "$NOX_LIST_URL" ]; then
-    echo "Error! Unknown playlist address Noxbit."
+    if [ -n "$RUN_STATUS" ]; then
+      echo "$RUN_STATUS"
+    else
+      echo "Noxbit: Unknown playlist address."
+    fi
     exit
   fi
 
@@ -122,12 +130,15 @@ else
   curl -s --connect-timeout 5 --max-time 20 -o "$NOX_FILE_GZ" -H "Accept-Encoding: gzip" "$NOX_LIST_URL"
 
   if [ ! -f "$NOX_FILE_GZ" ]; then
-    echo "Error! Could not load Noxbit playlist."
+    if [ -n "$RUN_STATUS" ]; then
+      echo "$RUN_STATUS"
+    else
+      echo "Noxbit: Could not load playlist."
+    fi
     exit
   fi
 
   gunzip -c "$NOX_FILE_GZ" > "$NOX_FILE"
-  mkdir -p $M3U_DIR
 
   [ "$CAT_SHOW" == 0 ] && del_cat "Развлекательные"
   [ "$CAT_COMM" == 0 ] && del_cat "Общие"
@@ -144,8 +155,33 @@ else
 
   sed 's/(на модерации)//; s/[ \t]*$//' -i $NOX_M3U
   [ "$ACETTV_IP" == "1" ] && sed "s|127\.0\.0\.1|$URL_IP|g" -i $NOX_M3U
+}
 
+# Main
+mkdir -p $M3U_DIR
+
+if [ "$ACETTV_IP" == "0" ]; then
+  URL_IP="127.0.0.1"
+else
+  URL_IP=`ifconfig eth0 | awk '/inet addr:/ {print $2}' | sed 's/addr://'`
+  if [ -z $URL_IP ]; then
+    URL_IP=`ifconfig wlan0 | awk '/inet addr:/ {print $2}' | sed 's/addr://'`
+    [ -z $URL_IP ] && URL_IP="127.0.0.1"
+  fi
 fi
+
+case "$TTV_SOFT" in
+  AceStream)
+    ace_run
+    ;;
+  Noxbit)
+    nox_run
+    ;;
+  *)
+    ace_run next
+    nox_run
+    ;;
+esac
 
 echo "Done! Playlist created."
 exit
