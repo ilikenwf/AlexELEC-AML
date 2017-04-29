@@ -52,7 +52,7 @@ index 11b08b5..eba385d 100644
 +      rtn = VC_PICTURE;
 +      m_noPictureLoop = 0;
 +    }
-+    else if (++m_noPictureLoop == 10 || timesize == 0.0) // EOS
++    else if (++m_noPictureLoop == 5 || timesize == 0.0) // EOS
 +      rtn = VC_BUFFER;
 +  }
 +  else
