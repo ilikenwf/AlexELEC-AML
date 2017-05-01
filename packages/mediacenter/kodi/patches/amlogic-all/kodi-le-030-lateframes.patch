@@ -1,20 +1,3 @@
---- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp	2017-04-21 10:59:59.209075420 +0200
-+++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp	2017-04-21 11:06:02.641075420 +0200
-@@ -636,9 +643,13 @@
-           //CLog::Log(LOGDEBUG, "%s: unknown duration(%f), cur_pts(%f)",
-           //  __MODULE_NAME__, duration, cur_pts);
-           break;
-+
-       }
-+      //if (framerate > 0.0)
-+      //  CLog::Log(LOGDEBUG, "CDVDVideoCodecAmlogic::FrameRateTracking: m_queue_depth:%d framerate(%f), video_rate(%d)",
-+      //  	m_queue_depth, framerate, (int)(0.5 + (96000.0 / framerate)));
- 
--      if (framerate > 0.0 && (int)m_framerate != (int)framerate)
-+      if (framerate > 0.0 && (int)(m_framerate*100.0) != (int)(framerate*100.0))
-       {
-         m_framerate = framerate;
-         m_video_rate = (int)(0.5 + (96000.0 / framerate));
 --- a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp	2017-04-21 14:42:16.371525222 +0200
 +++ b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp	2017-04-21 14:43:32.295525222 +0200
 @@ -1315,26 +1315,17 @@
@@ -50,4 +33,3 @@
      m_presentstep = PRESENT_FLIP;
      m_discard.push_back(m_presentsource);
      m_presentsource = idx;
-
