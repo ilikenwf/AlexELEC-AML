@@ -4,7 +4,7 @@
 ################################################################################
 
 PKG_NAME="noxbit"
-PKG_VERSION="4352698"
+PKG_VERSION="451509b"
 PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
@@ -23,11 +23,15 @@ make_target() {
 
 makeinstall_target() {
   mkdir -p $INSTALL/usr/bin
-    cp STM-* $INSTALL/usr/bin
     cp $PKG_DIR/scripts/* $INSTALL/usr/bin
   mkdir -p $INSTALL/usr/config/noxbit
     cp noxbit.cfg $INSTALL/usr/config/noxbit
     cp $PKG_DIR/config/* $INSTALL/usr/config/noxbit
+  mkdir -p $INSTALL/usr/config/noxbit/bin
+    cp STM-* $INSTALL/usr/config/noxbit/bin
+  ln -sf /storage/.config/noxbit/bin/STM-Agent $INSTALL/usr/bin/STM-Agent
+  ln -sf /storage/.config/noxbit/bin/STM-Downloader $INSTALL/usr/bin/STM-Downloader
+  ln -sf /storage/.config/noxbit/bin/STM-Hypervisor $INSTALL/usr/bin/STM-Hypervisor
 }
 
 post_install() {

@@ -4,7 +4,7 @@
 ################################################################################
 
 PKG_NAME="vdr-plugin-channelscan"
-PKG_VERSION="6ea9bad"
+PKG_VERSION="8b67baa"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
