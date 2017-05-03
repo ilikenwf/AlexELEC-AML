@@ -47,6 +47,7 @@ PKG_AUTORECONF="no"
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET pvr.vuplus"
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET pvr.stalker"
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET pvr.mediaportal.tvserver"
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET pvr.mythtv"
 
 # kodi-binary-addons inputstream
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET inputstream.rtmp"
