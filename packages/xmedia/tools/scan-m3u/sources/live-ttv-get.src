@@ -139,6 +139,7 @@ nox_run () {
   fi
 
   gunzip -c "$NOX_FILE_GZ" > "$NOX_FILE"
+  cp -f $NOX_FILE $NOX_M3U
 
   [ "$CAT_SHOW" == 0 ] && del_cat "Развлекательные"
   [ "$CAT_COMM" == 0 ] && del_cat "Общие"
