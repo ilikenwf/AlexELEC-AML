@@ -5,10 +5,6 @@
   <samba>
     <clienttimeout>30</clienttimeout>
   </samba>
-  <pvr>
-    <minvideocachelevel>5</minvideocachelevel>
-    <minaudiocachelevel>10</minaudiocachelevel>
-  </pvr>
   <cache>
     <memorysize>52428800</memorysize>  <!-- number of bytes used for buffering streams in memory
                                         When set to 0 the cache will be written to disk instead of RAM:
