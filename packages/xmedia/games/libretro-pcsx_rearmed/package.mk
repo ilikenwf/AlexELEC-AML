@@ -4,7 +4,7 @@
 ################################################################################
 
 PKG_NAME="libretro-pcsx_rearmed"
-PKG_VERSION="abdcbf0"
+PKG_VERSION="f0a02fd"
 PKG_REV="1"
 PKG_ARCH="arm"
 PKG_LICENSE="GPLv2"
@@ -19,19 +19,12 @@ PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 
 configure_target() {
-  : none
+  strip_gold
 }
 
 make_target() {
   cd $ROOT/$PKG_BUILD
-  case $PROJECT in
-    RPi2)
-      make -f Makefile.libretro platform=rpi2
-      ;;
-    *)
-      make -f Makefile.libretro platform="armv neon hardfloat"
-      ;;
-  esac
+  make -f Makefile.libretro platform="armv neon hardfloat" GIT_VERSION=$PKG_VERSION
 }
 
 makeinstall_target() {
