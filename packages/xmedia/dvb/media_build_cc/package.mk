@@ -4,7 +4,7 @@
 ################################################################################
 
 PKG_NAME="media_build_cc"
-PKG_VERSION="20170418"
+PKG_VERSION="20170508"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
