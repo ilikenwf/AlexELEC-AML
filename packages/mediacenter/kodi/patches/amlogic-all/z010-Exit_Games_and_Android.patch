@@ -1,6 +1,6 @@
-diff -Naurp kodi-17.0-beta7-b9fe8e9/addons/resource.language.en_gb/resources/strings.po kodi-17.0-beta7-b9fe8e9-patch/addons/resource.language.en_gb/resources/strings.po
---- kodi-17.0-beta7-b9fe8e9/addons/resource.language.en_gb/resources/strings.po	2016-12-05 20:49:44.000000000 +0200
-+++ kodi-17.0-beta7-b9fe8e9-patch/addons/resource.language.en_gb/resources/strings.po	2016-12-06 09:48:10.000000000 +0200
+diff -Naurp kodi-17.2-rc1-274fed4/addons/resource.language.en_gb/resources/strings.po kodi-17.2-rc1-274fed4-patch/addons/resource.language.en_gb/resources/strings.po
+--- kodi-17.2-rc1-274fed4/addons/resource.language.en_gb/resources/strings.po	2017-05-09 18:16:46.000000000 +0300
++++ kodi-17.2-rc1-274fed4-patch/addons/resource.language.en_gb/resources/strings.po	2017-05-09 18:14:51.000000000 +0300
 @@ -5596,7 +5596,7 @@ msgstr ""
  #: system/settings/settings.xml
  #: addons/skin.estuary/1080i/DialogButtonMenu.xml
@@ -19,10 +19,10 @@ diff -Naurp kodi-17.0-beta7-b9fe8e9/addons/resource.language.en_gb/resources/str
  msgstr ""
  
  #: addons/skin.estuary/1080i/DialogButtonMenu.xml
-diff -Naurp kodi-17.0-beta7-b9fe8e9/xbmc/Application.cpp kodi-17.0-beta7-b9fe8e9-patch/xbmc/Application.cpp
---- kodi-17.0-beta7-b9fe8e9/xbmc/Application.cpp	2016-12-05 20:49:44.000000000 +0200
-+++ kodi-17.0-beta7-b9fe8e9-patch/xbmc/Application.cpp	2016-12-06 08:47:08.000000000 +0200
-@@ -224,6 +224,9 @@
+diff -Naurp kodi-17.2-rc1-274fed4/xbmc/Application.cpp kodi-17.2-rc1-274fed4-patch/xbmc/Application.cpp
+--- kodi-17.2-rc1-274fed4/xbmc/Application.cpp	2017-05-09 18:16:46.000000000 +0300
++++ kodi-17.2-rc1-274fed4-patch/xbmc/Application.cpp	2017-05-09 18:14:51.000000000 +0300
+@@ -223,6 +223,9 @@
  #include "pictures/GUIWindowSlideShow.h"
  #include "windows/GUIWindowLoginScreen.h"
  
@@ -32,7 +32,7 @@ diff -Naurp kodi-17.0-beta7-b9fe8e9/xbmc/Application.cpp kodi-17.0-beta7-b9fe8e9
  using namespace ADDON;
  using namespace XFILE;
  #ifdef HAS_DVD_DRIVE
-@@ -2431,7 +2434,8 @@ void CApplication::OnApplicationMessage(
+@@ -2419,7 +2422,8 @@ void CApplication::OnApplicationMessage(
      break;
  
    case TMSG_QUIT:
@@ -42,7 +42,7 @@ diff -Naurp kodi-17.0-beta7-b9fe8e9/xbmc/Application.cpp kodi-17.0-beta7-b9fe8e9
      break;
    
    case TMSG_SHUTDOWN:
-@@ -2443,7 +2447,8 @@ void CApplication::OnApplicationMessage(
+@@ -2431,7 +2435,8 @@ void CApplication::OnApplicationMessage(
      break;
  
    case TMSG_HIBERNATE:
@@ -52,7 +52,7 @@ diff -Naurp kodi-17.0-beta7-b9fe8e9/xbmc/Application.cpp kodi-17.0-beta7-b9fe8e9
      break;
  
    case TMSG_SUSPEND:
-@@ -3007,6 +3012,18 @@ void CApplication::Stop(int exitCode)
+@@ -3000,6 +3005,18 @@ void CApplication::Stop(int exitCode)
  
    cleanup_emu_environ();
  
@@ -71,9 +71,26 @@ diff -Naurp kodi-17.0-beta7-b9fe8e9/xbmc/Application.cpp kodi-17.0-beta7-b9fe8e9
    Sleep(200);
  }
  
-diff -Naurp kodi-17.0-beta7-b9fe8e9/xbmc/GUIInfoManager.cpp kodi-17.0-beta7-b9fe8e9-patch/xbmc/GUIInfoManager.cpp
---- kodi-17.0-beta7-b9fe8e9/xbmc/GUIInfoManager.cpp	2016-12-05 20:49:44.000000000 +0200
-+++ kodi-17.0-beta7-b9fe8e9-patch/xbmc/GUIInfoManager.cpp	2016-12-06 08:43:41.000000000 +0200
+diff -Naurp kodi-17.2-rc1-274fed4/xbmc/Application.cpp.orig kodi-17.2-rc1-274fed4-patch/xbmc/Application.cpp.orig
+--- kodi-17.2-rc1-274fed4/xbmc/Application.cpp.orig	2017-05-09 18:16:46.000000000 +0300
++++ kodi-17.2-rc1-274fed4-patch/xbmc/Application.cpp.orig	2017-05-09 18:14:51.000000000 +0300
+@@ -5238,3 +5238,13 @@ bool CApplication::NotifyActionListeners
+   
+   return false;
+ }
++
++bool CApplication::ScreenSaverDisablesAutoScrolling()
++{
++  bool onBlackDimScreenSaver = IsInScreenSaver() && m_screenSaver &&
++    (m_screenSaver->ID() == "screensaver.xbmc.builtin.black" ||
++     m_screenSaver->ID() == "screensaver.xbmc.builtin.dim");
++  bool openingStreams = m_pPlayer->IsPlaying() && g_windowManager.IsWindowActive(WINDOW_DIALOG_BUSY);
++
++  return onBlackDimScreenSaver || openingStreams;
++}
+diff -Naurp kodi-17.2-rc1-274fed4/xbmc/GUIInfoManager.cpp kodi-17.2-rc1-274fed4-patch/xbmc/GUIInfoManager.cpp
+--- kodi-17.2-rc1-274fed4/xbmc/GUIInfoManager.cpp	2017-05-09 18:16:46.000000000 +0300
++++ kodi-17.2-rc1-274fed4-patch/xbmc/GUIInfoManager.cpp	2017-05-09 18:14:51.000000000 +0300
 @@ -7026,7 +7026,7 @@ bool CGUIInfoManager::GetBool(int condit
    else if (condition == SYSTEM_LOGGEDON)
      bReturn = !(g_windowManager.GetActiveWindow() == WINDOW_LOGIN_SCREEN);
@@ -83,9 +100,9 @@ diff -Naurp kodi-17.0-beta7-b9fe8e9/xbmc/GUIInfoManager.cpp kodi-17.0-beta7-b9fe
    else if (condition == SYSTEM_HAS_LOGINSCREEN)
      bReturn = CProfilesManager::GetInstance().UsingLoginScreen();
    else if (condition == SYSTEM_HAS_MODAL_DIALOG)
-diff -Naurp kodi-17.0-beta7-b9fe8e9/xbmc/powermanagement/linux/LogindUPowerSyscall.cpp kodi-17.0-beta7-b9fe8e9-patch/xbmc/powermanagement/linux/LogindUPowerSyscall.cpp
---- kodi-17.0-beta7-b9fe8e9/xbmc/powermanagement/linux/LogindUPowerSyscall.cpp	2016-12-01 11:20:47.000000000 +0200
-+++ kodi-17.0-beta7-b9fe8e9-patch/xbmc/powermanagement/linux/LogindUPowerSyscall.cpp	2016-12-05 20:47:53.000000000 +0200
+diff -Naurp kodi-17.2-rc1-274fed4/xbmc/powermanagement/linux/LogindUPowerSyscall.cpp kodi-17.2-rc1-274fed4-patch/xbmc/powermanagement/linux/LogindUPowerSyscall.cpp
+--- kodi-17.2-rc1-274fed4/xbmc/powermanagement/linux/LogindUPowerSyscall.cpp	2017-05-08 10:20:15.000000000 +0300
++++ kodi-17.2-rc1-274fed4-patch/xbmc/powermanagement/linux/LogindUPowerSyscall.cpp	2017-05-09 18:14:51.000000000 +0300
 @@ -50,10 +50,10 @@ CLogindUPowerSyscall::CLogindUPowerSysca
    if (!m_hasUPower)
      CLog::Log(LOGINFO, "LogindUPowerSyscall - UPower not found, battery information will not be available");
@@ -101,10 +118,10 @@ diff -Naurp kodi-17.0-beta7-b9fe8e9/xbmc/powermanagement/linux/LogindUPowerSysca
  
    InhibitDelayLock();
  
-diff -Naurp kodi-17.0-beta7-b9fe8e9/xbmc/powermanagement/PowerManager.cpp kodi-17.0-beta7-b9fe8e9-patch/xbmc/powermanagement/PowerManager.cpp
---- kodi-17.0-beta7-b9fe8e9/xbmc/powermanagement/PowerManager.cpp	2016-12-01 11:20:47.000000000 +0200
-+++ kodi-17.0-beta7-b9fe8e9-patch/xbmc/powermanagement/PowerManager.cpp	2016-12-06 09:48:47.000000000 +0200
-@@ -312,17 +312,8 @@ void CPowerManager::OnLowBattery()
+diff -Naurp kodi-17.2-rc1-274fed4/xbmc/powermanagement/PowerManager.cpp kodi-17.2-rc1-274fed4-patch/xbmc/powermanagement/PowerManager.cpp
+--- kodi-17.2-rc1-274fed4/xbmc/powermanagement/PowerManager.cpp	2017-05-08 10:20:15.000000000 +0300
++++ kodi-17.2-rc1-274fed4-patch/xbmc/powermanagement/PowerManager.cpp	2017-05-09 18:21:38.000000000 +0300
+@@ -312,17 +312,6 @@ void CPowerManager::OnLowBattery()
  
  void CPowerManager::SettingOptionsShutdownStatesFiller(const CSetting *setting, std::vector< std::pair<std::string, int> > &list, int &current, void *data)
  {
@@ -122,13 +139,11 @@ diff -Naurp kodi-17.0-beta7-b9fe8e9/xbmc/powermanagement/PowerManager.cpp kodi-1
 -#endif
 -  }
 +  list.push_back(make_pair(g_localizeStrings.Get(13005), POWERSTATE_SHUTDOWN));
-+  list.push_back(make_pair(g_localizeStrings.Get(13010), POWERSTATE_HIBERNATE));
 +  list.push_back(make_pair(g_localizeStrings.Get(13011), POWERSTATE_SUSPEND));
-+  list.push_back(make_pair(g_localizeStrings.Get(13012), POWERSTATE_QUIT));
  }
-diff -Naurp kodi-17.0-beta7-b9fe8e9/xbmc/XBApplicationEx.h kodi-17.0-beta7-b9fe8e9-patch/xbmc/XBApplicationEx.h
---- kodi-17.0-beta7-b9fe8e9/xbmc/XBApplicationEx.h	2016-12-05 20:49:43.000000000 +0200
-+++ kodi-17.0-beta7-b9fe8e9-patch/xbmc/XBApplicationEx.h	2016-12-05 20:47:53.000000000 +0200
+diff -Naurp kodi-17.2-rc1-274fed4/xbmc/XBApplicationEx.h kodi-17.2-rc1-274fed4-patch/xbmc/XBApplicationEx.h
+--- kodi-17.2-rc1-274fed4/xbmc/XBApplicationEx.h	2017-05-09 18:16:46.000000000 +0300
++++ kodi-17.2-rc1-274fed4-patch/xbmc/XBApplicationEx.h	2017-05-09 18:14:51.000000000 +0300
 @@ -31,6 +31,8 @@ enum {
    EXITCODE_POWERDOWN = 64,
    EXITCODE_RESTARTAPP= 65,
