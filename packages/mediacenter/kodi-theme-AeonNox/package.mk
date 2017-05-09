@@ -47,4 +47,7 @@ makeinstall_target() {
 
   mkdir -p $INSTALL/usr/share/kodi/addons
   ln -sf /storage/.config/kodi.skins/skin.aeon.nox.5ae $INSTALL/usr/share/kodi/addons/skin.aeon.nox.5ae
+
+  mkdir -p $INSTALL/usr/share/kodi/config
+    cp $PKG_DIR/config/Nox-DialogButtonMenu.xml $INSTALL/usr/share/kodi/config
 }
