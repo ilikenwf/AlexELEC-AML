@@ -1,0 +1,11 @@
+diff -Naurp kodi-17.2-rc1-274fed4/system/keymaps/keyboard.xml kodi-17.2-rc1-274fed4-patch/system/keymaps/keyboard.xml
+--- kodi-17.2-rc1-274fed4/system/keymaps/keyboard.xml	2017-05-10 19:51:33.000000000 +0300
++++ kodi-17.2-rc1-274fed4-patch/system/keymaps/keyboard.xml	2017-05-10 19:48:40.000000000 +0300
+@@ -352,6 +352,7 @@
+       <menu>OSD</menu>
+       <i>Info</i>
+       <o>PlayerProcessInfo</o>
++      <o mod="longpress">PlayerDebug</o>
+       <o mod="ctrl,shift">PlayerDebug</o>
+       <z>AspectRatio</z>
+       <zoom>AspectRatio</zoom>
