@@ -22,6 +22,6 @@ make_target() {
 }
 
 makeinstall_target() {
-  mkdir -p $INSTALL/etc/emulationstation/themes/es-theme-carbon
-    cp -r * $INSTALL/etc/emulationstation/themes/es-theme-carbon
+  mkdir -p $INSTALL/usr/config/emulationstation/themes/es-theme-carbon
+    cp -r * $INSTALL/usr/config/emulationstation/themes/es-theme-carbon
 }
