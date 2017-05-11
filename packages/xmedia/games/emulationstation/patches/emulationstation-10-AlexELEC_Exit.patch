@@ -1,12 +1,13 @@
-diff -Naurp emulationstation-76c1538/es-app/src/guis/GuiMenu.cpp emulationstation-76c1538-patch/es-app/src/guis/GuiMenu.cpp
---- emulationstation-76c1538/es-app/src/guis/GuiMenu.cpp	2016-08-24 09:39:19.000000000 +0300
-+++ emulationstation-76c1538-patch/es-app/src/guis/GuiMenu.cpp	2016-08-24 08:55:39.000000000 +0300
-@@ -209,8 +209,31 @@ GuiMenu::GuiMenu(Window* window) : GuiCo
- 			mWindow->pushGui(new GuiDetectDevice(mWindow, false, nullptr));
+diff -Naurp emulationstation-268e6c8/es-app/src/guis/GuiMenu.cpp emulationstation-268e6c8-patch/es-app/src/guis/GuiMenu.cpp
+--- emulationstation-268e6c8/es-app/src/guis/GuiMenu.cpp	2017-05-11 19:18:11.000000000 +0300
++++ emulationstation-268e6c8-patch/es-app/src/guis/GuiMenu.cpp	2017-05-11 19:25:55.000000000 +0300
+@@ -215,8 +215,31 @@ GuiMenu::GuiMenu(Window* window) : GuiCo
+ 			);
  	});
  
+-	addEntry("QUIT", 0x777777FF, true, 
 +	addEntry("RETROARCH", 0x777777FF, true, 
-+		[this] {
+ 		[this] {
 +						remove("/var/lock/start.games");
 +						runSystemCommand("touch /var/lock/start.retro");
 +						runSystemCommand("systemctl start retroarch.service");
@@ -25,40 +26,39 @@ diff -Naurp emulationstation-76c1538/es-app/src/guis/GuiMenu.cpp emulationstatio
 +						runShutdownCommand();
 +	});
 +
- 	addEntry("QUIT", 0x777777FF, true, 
- 		[this] {
++	addEntry("KODI", 0x777777FF, true, 
++		[this] {
 +						remove("/var/lock/start.games");
 +						runSystemCommand("touch /var/lock/start.kodi");
 +						runSystemCommand("systemctl start kodi.service");
  						SDL_Event ev;
  						ev.type = SDL_QUIT;
  						SDL_PushEvent(&ev);
-diff -Naurp emulationstation-76c1538/es-app/src/main.cpp emulationstation-76c1538-patch/es-app/src/main.cpp
---- emulationstation-76c1538/es-app/src/main.cpp	2016-05-10 01:45:23.000000000 +0300
-+++ emulationstation-76c1538-patch/es-app/src/main.cpp	2016-08-24 08:57:54.000000000 +0300
-@@ -280,6 +280,9 @@ int main(int argc, char* argv[])
+diff -Naurp emulationstation-268e6c8/es-app/src/main.cpp emulationstation-268e6c8-patch/es-app/src/main.cpp
+--- emulationstation-268e6c8/es-app/src/main.cpp	2017-05-11 19:18:04.000000000 +0300
++++ emulationstation-268e6c8-patch/es-app/src/main.cpp	2017-05-11 19:28:49.000000000 +0300
+@@ -255,7 +255,10 @@ int main(int argc, char* argv[])
+ 		// we can't handle es_systems.cfg file problems inside ES itself, so display the error message then quit
  		window.pushGui(new GuiMsgBox(&window,
  			errorMsg,
- 			"QUIT", [] { 
+-			"QUIT", [] { 
++			"QUIT", [] {
 +				remove("/var/lock/start.games");
 +				runSystemCommand("touch /var/lock/start.kodi");
 +				runSystemCommand("systemctl start kodi.service");
  				SDL_Event* quit = new SDL_Event();
  				quit->type = SDL_QUIT;
  				SDL_PushEvent(quit);
-diff -Naurp emulationstation-76c1538/es-core/src/platform.cpp emulationstation-76c1538-patch/es-core/src/platform.cpp
---- emulationstation-76c1538/es-core/src/platform.cpp	2016-05-10 01:45:23.000000000 +0300
-+++ emulationstation-76c1538-patch/es-core/src/platform.cpp	2016-08-24 09:02:24.000000000 +0300
-@@ -82,26 +82,12 @@ std::string getHomePath()
+diff -Naurp emulationstation-268e6c8/es-core/src/platform.cpp emulationstation-268e6c8-patch/es-core/src/platform.cpp
+--- emulationstation-268e6c8/es-core/src/platform.cpp	2017-05-11 19:18:04.000000000 +0300
++++ emulationstation-268e6c8-patch/es-core/src/platform.cpp	2017-05-11 19:30:16.000000000 +0300
+@@ -43,20 +43,12 @@ std::string getHomePath()
  
  int runShutdownCommand()
  {
--#if defined(WIN32)
+-#ifdef WIN32 // windows
 -	return system("shutdown -s -t 0");
--#elif defined(__linux__)
--	sync();
--	return reboot(RB_POWER_OFF);
--#else
+-#else // osx / linux
 -	return system("sudo shutdown -h now");
 -#endif
 +	return system("systemctl poweroff");
@@ -66,12 +66,9 @@ diff -Naurp emulationstation-76c1538/es-core/src/platform.cpp emulationstation-7
  
  int runRestartCommand()
  {
--#if defined(WIN32)
+-#ifdef WIN32 // windows
 -	return system("shutdown -r -t 0");
--#elif defined(__linux__)
--	sync();
--	return reboot(RB_AUTOBOOT);
--#else
+-#else // osx / linux
 -	return system("sudo shutdown -r now");
 -#endif
 +	return system("systemctl reboot");
