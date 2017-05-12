@@ -63,6 +63,41 @@ diff -Naurp emulationstation-268e6c8/es-core/src/InputManager.cpp emulationstati
  	return path;
  }
  
+diff -Naurp emulationstation-268e6c8/es-core/src/platform.cpp emulationstation-268e6c8-patch/es-core/src/platform.cpp
+--- emulationstation-268e6c8/es-core/src/platform.cpp	2017-05-11 20:34:54.000000000 +0300
++++ emulationstation-268e6c8-patch/es-core/src/platform.cpp	2017-05-12 12:22:42.000000000 +0300
+@@ -13,29 +13,13 @@ std::string getHomePath()
+ {
+ 	std::string homePath;
+ 
+-	// this should give you something like "/home/YOUR_USERNAME" on Linux and "C:\Users\YOUR_USERNAME\" on Windows
+-	const char * envHome = getenv("HOME");
++	// this should give you something like "/storage/.config" on AlexELEC
++	const char * envHome = getenv("HOME_CONFIG");
+ 	if(envHome != nullptr)
+ 	{
+ 		homePath = envHome;
+ 	}
+ 
+-#ifdef WIN32
+-	// but does not seem to work for Windows XP or Vista, so try something else
+-	if (homePath.empty()) {
+-		const char * envDir = getenv("HOMEDRIVE");
+-		const char * envPath = getenv("HOMEPATH");
+-		if (envDir != nullptr && envPath != nullptr) {
+-			homePath = envDir;
+-			homePath += envPath;
+-
+-			for(unsigned int i = 0; i < homePath.length(); i++)
+-				if(homePath[i] == '\\')
+-					homePath[i] = '/';
+-		}
+-	}
+-#endif
+-
+ 	// convert path to generic directory seperators
+ 	boost::filesystem::path genericPath(homePath);
+ 	return genericPath.generic_string();
 diff -Naurp emulationstation-268e6c8/es-core/src/Settings.cpp emulationstation-268e6c8-patch/es-core/src/Settings.cpp
 --- emulationstation-268e6c8/es-core/src/Settings.cpp	2017-05-11 20:34:49.000000000 +0300
 +++ emulationstation-268e6c8-patch/es-core/src/Settings.cpp	2017-05-11 22:23:16.000000000 +0300
