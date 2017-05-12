@@ -4,7 +4,7 @@
 ################################################################################
 
 PKG_NAME="libretro-parallel-n64"
-PKG_VERSION="a9101ca"
+PKG_VERSION="44700e6"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
@@ -29,15 +29,16 @@ pre_build_target() {
 make_target() {
   case $PROJECT in
     S805)
-      make platform=armv-aml805
+      project=armv-aml805
       ;;
     S812)
-      make platform=armv-aml812
+      project=armv-aml812
       ;;
     S905)
-      make platform=armv-aml905
+      project=armv-aml905
       ;;
   esac
+  make WITH_DYNAREC=$TARGET_ARCH platform=$project
 }
 
 makeinstall_target() {
