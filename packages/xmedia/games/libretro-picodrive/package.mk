@@ -4,7 +4,7 @@
 ################################################################################
 
 PKG_NAME="libretro-picodrive"
-PKG_VERSION="f5de3ba"
+PKG_VERSION="cbc93b6"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="MAME"
@@ -59,15 +59,16 @@ configure_target() {
 make_target() {
   case $PROJECT in
     S805)
-       make -f Makefile.libretro platform=armv-aml805
+       project=armv-aml805
       ;;
     S812)
-      make -f Makefile.libretro platform=armv-aml812
+      project=armv-aml812
       ;;
     S905)
-      make -f Makefile.libretro platform=armv-aml905
+      project=armv-aml905
       ;;
   esac
+  make -f Makefile.libretro platform=$project
 }
 
 makeinstall_target() {
