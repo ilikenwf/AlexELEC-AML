@@ -3,11 +3,11 @@ Description=EmulationStation emulator frontend
 ConditionPathExists=/var/lock/start.games
 
 [Service]
-Environment=DISPLAY=:0.0
 Environment=SDL_AUDIODRIVER=alsa
 Environment=SDL_MOUSE_RELATIVE=0
 Environment=FB_MULTI_BUFFER=2
-Environment=HOME=/storage/.config
+Environment=HOME_CONFIG=/storage/.config
+Environment=HOME=/storage
 ExecStartPre=-/usr/bin/remotecfg /storage/.config/amremote/remote-games.conf
 ExecStartPre=/usr/bin/emustation-config
 ExecStart=/usr/bin/emulationstation
