@@ -19,7 +19,6 @@ PKG_AUTORECONF="no"
 
 # theme for Emulationstation
 PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET emulationstation-theme-simple-dark"
-PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET emulationstation-theme-carbon"
 
 unpack() {
   git clone --recursive https://github.com/RetroPie/EmulationStation $PKG_BUILD
