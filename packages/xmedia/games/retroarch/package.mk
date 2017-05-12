@@ -4,12 +4,13 @@
 ################################################################################
 
 PKG_NAME="retroarch"
-PKG_VERSION="76a53e7"
+PKG_VERSION="e7061a8"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/libretro/RetroArch"
-PKG_URL="none"
+PKG_URL="https://github.com/libretro/RetroArch/archive/$PKG_VERSION.tar.gz"
+PKG_SOURCE_DIR="RetroArch-$PKG_VERSION*"
 PKG_DEPENDS_TARGET="toolchain samba avahi nss-mdns ffmpeg alsa-lib freetype zlib retroarch-assets core-info retroarch-joypad-autoconfig common-shaders common-overlays libretro-database"
 PKG_SECTION="xmedia/games"
 PKG_SHORTDESC="Reference frontend for the libretro API."
@@ -19,14 +20,6 @@ PKG_AUTORECONF="no"
 
 PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET $OPENGLES"
 
-unpack() {
-  git clone --recursive https://github.com/libretro/RetroArch $PKG_BUILD
-  cd $PKG_BUILD
-  git reset --hard $PKG_VERSION
-  rm -rf .git
-  cd $ROOT
-}
-
 TARGET_CONFIGURE_OPTS=""
 PKG_CONFIGURE_OPTS_TARGET="--disable-vg \
                            --disable-sdl \
@@ -35,6 +28,7 @@ PKG_CONFIGURE_OPTS_TARGET="--disable-vg \
                            --disable-oss \
                            --enable-opengles \
                            --disable-kms \
+                           --disable-x11 \
                            --enable-mali_fbdev \
                            --enable-neon \
                            --enable-fbo \
