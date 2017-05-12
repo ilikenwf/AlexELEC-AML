@@ -93,7 +93,6 @@ configure_target() {
               --disable-vdpau \
               --disable-dxva2 \
               --enable-runtime-cpudetect \
-              --enable-hardcoded-tables \
               --disable-memalign-hack \
               --disable-encoders \
               --enable-encoder=ac3 \
