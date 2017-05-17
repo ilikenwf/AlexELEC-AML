@@ -5,4 +5,9 @@
   <samba>
     <clienttimeout>30</clienttimeout>
   </samba>
+  <pvr>
+    <minvideocachelevel>20</minvideocachelevel>
+    <minaudiocachelevel>20</minaudiocachelevel>
+    <cacheindvdplayer>true</cacheindvdplayer>
+  </pvr>
 </advancedsettings>
