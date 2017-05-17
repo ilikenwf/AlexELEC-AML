@@ -1,13 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <advancedsettings>
   <splash>false</splash>
-  <remotedelay>1</remotedelay>
   <samba>
     <clienttimeout>30</clienttimeout>
   </samba>
-  <pvr>
-    <minvideocachelevel>20</minvideocachelevel>
-    <minaudiocachelevel>20</minaudiocachelevel>
-    <cacheindvdplayer>true</cacheindvdplayer>
-  </pvr>
 </advancedsettings>
