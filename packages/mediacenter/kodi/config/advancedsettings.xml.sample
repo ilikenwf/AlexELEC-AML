@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <advancedsettings>
   <splash>false</splash>
-  <remotedelay>1</remotedelay>
   <samba>
     <clienttimeout>30</clienttimeout>
   </samba>
   <pvr>
-    <minvideocachelevel>20</minvideocachelevel>
-    <minaudiocachelevel>20</minaudiocachelevel>
-    <cacheindvdplayer>true</cacheindvdplayer>
+    <minvideocachelevel>5</minvideocachelevel>
+    <minaudiocachelevel>10</minaudiocachelevel>
   </pvr>
   <cache>
     <memorysize>52428800</memorysize>  <!-- number of bytes used for buffering streams in memory
