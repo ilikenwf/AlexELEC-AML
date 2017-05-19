@@ -71,7 +71,7 @@ ace_run () {
   fi
 
   gunzip -c "$JSON_FILE_GZ" > "$JSON_FILE"
-  /usr/bin/jq -r '.[] | .cat + " # " + .name + " # " + .fname + " # " + .cid' $JSON_FILE > $TMP_LIST
+  /usr/bin/jq -r '.|= sort_by(.cat,.name)|.[]|select(.source!="as.json")| .cat + " # " + .name + " # " + .fname + " # " + .cid' $JSON_FILE > $TMP_LIST
 
   [ "$CAT_SHOW" == 0 ] && sed '/^Развлекательные/d' -i $TMP_LIST
   [ "$CAT_COMM" == 0 ] && sed '/^Общие/d' -i $TMP_LIST
@@ -88,9 +88,7 @@ ace_run () {
   [ "$CAT_ALLFON" == 0 ] && sed '/^allfon/d' -i $TMP_LIST
 
   sed '/^$/d' -i $TMP_LIST
-  sort -o $TMP_LIST.sort $TMP_LIST
-  mv -f $TMP_LIST.sort $TMP_LIST
-
+ 
   echo '#EXTM3U' > $ACE_M3U
   echo '#EXTM3U' > $ACE_M3U_DIRECT
 
