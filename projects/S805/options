@@ -24,7 +24,7 @@
     KERNEL_TARGET="uImage"
 
   # Kernel extra targets to build
-    KERNEL_UBOOT_EXTRA_TARGET=""
+    KERNEL_UBOOT_EXTRA_TARGET="meson8b_m201_vander.dtd meson8b_m201_vander.dtb"
 
   # Build Android kernel image using mkbootimg
     BUILD_ANDROID_BOOTIMG="yes"
@@ -37,7 +37,6 @@
 
   # Kernel to use. values can be:
   # default:  default mainline kernel
-    LINUX="custom"
     KERNEL_VERSION="fb5b898"
     KERNEL_URL="https://github.com/kszaq/linux/archive/$KERNEL_VERSION.tar.gz"
 
