@@ -4,10 +4,13 @@
 ################################################################################
 
 PKG_NAME="linux"
+PKG_VERSION="$KERNEL_VERSION"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kernel.org"
+PKG_URL="$KERNEL_URL"
+PKG_SOURCE_DIR="$KERNEL_SOURCE_DIR"
 PKG_DEPENDS_HOST="ccache:host"
 PKG_DEPENDS_TARGET="toolchain cpio:host kmod:host pciutils xz:host wireless-regdb keyutils"
 PKG_DEPENDS_INIT="toolchain"
@@ -15,28 +18,6 @@ PKG_NEED_UNPACK="$LINUX_DEPENDS"
 PKG_SECTION="linux"
 PKG_SHORTDESC="linux26: The Linux kernel 2.6 precompiled kernel binary image and modules"
 PKG_LONGDESC="This package contains a precompiled kernel image and the modules."
-case "$LINUX" in
-  amlogic-3.10)
-    PKG_VERSION="86c93aa"
-    PKG_URL="https://github.com/LibreELEC/linux-amlogic/archive/$PKG_VERSION.tar.gz"
-    PKG_SOURCE_DIR="$PKG_NAME-amlogic-$PKG_VERSION*"
-    ;;
-  amlogic-3.14)
-    PKG_VERSION="069e204"
-    PKG_URL="https://github.com/LibreELEC/linux-amlogic/archive/$PKG_VERSION.tar.gz"
-    PKG_SOURCE_DIR="$PKG_NAME-amlogic-$PKG_VERSION*"
-    ;;
-  custom)
-    PKG_VERSION="$KERNEL_VERSION"
-    PKG_URL="$KERNEL_URL"
-    PKG_SOURCE_DIR="$KERNEL_SOURCE_DIR"
-    ;;
-  *)
-    PKG_VERSION="4.8.4"
-    PKG_URL="http://www.kernel.org/pub/linux/kernel/v4.x/$PKG_NAME-$PKG_VERSION.tar.xz"
-    ;;
-esac
-
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 
@@ -112,14 +93,6 @@ post_patch() {
     sed -i -e "s|^CONFIG_ISCSI_IBFT=.*$|# CONFIG_ISCSI_IBFT is not set|" $PKG_BUILD/.config
   fi
 
-  # enable different libcec version for imx6 project with kernel 4.4
-  # using customized kernel driver
-  if [ "$PROJECT" = "imx6" ]; then
-    if [ "$LIBCEC_TYPE" = "xbian" -a "$LINUX" = "imx6-4.4-xbian" ]; then
-      sed -i -e "s|# CONFIG_MXC_HDMI_CEC is not set|CONFIG_MXC_HDMI_CEC=y|" $PKG_BUILD/.config
-      sed -i -e "s|CONFIG_MXC_HDMI_CEC_SR=y||" $PKG_BUILD/.config
-    fi
-  fi
 }
 
 makeinstall_host() {
