@@ -4,14 +4,12 @@
 ################################################################################
 
 PKG_NAME="tvheadend"
-PKG_VERSION="eb3e25f"
-PKG_VERSION_NUMBER="4.1.2520"
+PKG_VERSION="0aa08ae"
 PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.tvheadend.org"
-PKG_URL="https://github.com/tvheadend/tvheadend/archive/$PKG_VERSION.tar.gz"
-PKG_SOURCE_DIR="tvheadend-${PKG_VERSION}*"
+PKG_URL=""
 PKG_DEPENDS_TARGET="toolchain curl libdvbcsa libiconv libressl Python:host yasm jq"
 PKG_SECTION="xmedia/tvservice"
 PKG_SHORTDESC="Tvheadend: a TV streaming server for Linux supporting DVB-S, DVB-S2, DVB-C, DVB-T, ATSC, IPTV, and Analog video (V4L) as input sources."
@@ -20,8 +18,15 @@ PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 PKG_LOCALE_INSTALL="yes"
 
-post_unpack() {
-  sed -e 's/VER="0.0.0~unknown"/VER="'$PKG_VERSION_NUMBER' ~ AlexELEC Tvh-Server"/g' -i $PKG_BUILD/support/version
+unpack() {
+  git clone -b 'release/4.2' https://github.com/tvheadend/tvheadend.git $PKG_BUILD
+  cd $PKG_BUILD
+  git reset --hard $PKG_VERSION
+  PKG_VERSION_NUMBER=`git describe --match "v*"`
+  echo "****** version: $PKG_VERSION_NUMBER ******"
+  sed -e 's/VER="0.0.0~unknown"/VER="'$PKG_VERSION_NUMBER' ~ Alex@ELEC"/g' -i support/version
+  rm -rf .git
+  cd $ROOT
 }
 
 PKG_CONFIGURE_OPTS_TARGET="--prefix=/usr \
@@ -84,4 +89,3 @@ post_makeinstall_target() {
 post_install() {
   enable_service tvheadend.service
 }
-
