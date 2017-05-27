@@ -4,7 +4,7 @@
 ################################################################################
 
 PKG_NAME="noxbit"
-PKG_VERSION="770b9ed"
+PKG_VERSION="12f0c11"
 PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
