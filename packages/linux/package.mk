@@ -126,6 +126,7 @@ make_target() {
 
   ( cd $ROOT
     rm -rf $ROOT/$BUILD/initramfs
+    rm -rf $ROOT/$BUILD/plymouth-lite-*
     $SCRIPTS/install initramfs
   )
 
