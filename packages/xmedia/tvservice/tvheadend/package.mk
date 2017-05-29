@@ -4,13 +4,13 @@
 ################################################################################
 
 PKG_NAME="tvheadend"
-PKG_VERSION="0aa08ae"
+PKG_VERSION="76dbc3e"
 PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.tvheadend.org"
 PKG_URL=""
-PKG_DEPENDS_TARGET="toolchain curl libdvbcsa libiconv libressl Python:host yasm jq"
+PKG_DEPENDS_TARGET="toolchain curl libdvbcsa libiconv libressl pngquant:host Python:host yasm jq"
 PKG_SECTION="xmedia/tvservice"
 PKG_SHORTDESC="Tvheadend: a TV streaming server for Linux supporting DVB-S, DVB-S2, DVB-C, DVB-T, ATSC, IPTV, and Analog video (V4L) as input sources."
 PKG_LONGDESC="Tvheadend is a TV streaming server for Linux supporting DVB-S, DVB-S2, DVB-C, DVB-T, ATSC, IPTV, and Analog video (V4L) as input sources. It also comes with a powerful and easy to use web interface both used for configuration and day-to-day operations, such as searching the EPG and scheduling recordings. Even so, the most notable feature of Tvheadend is how easy it is to set up: Install it, navigate to the web user interface, drill into the TV adapters tab, select your current location and Tvheadend will start scanning channels and present them to you in just a few minutes. If installing as an Addon a reboot is needed"
@@ -25,6 +25,7 @@ unpack() {
   PKG_VERSION_NUMBER=`git describe --match "v*"`
   echo "****** version: $PKG_VERSION_NUMBER ******"
   sed -e 's/VER="0.0.0~unknown"/VER="'$PKG_VERSION_NUMBER' ~ Alex@ELEC"/g' -i support/version
+  sed -e 's|'/usr/bin/pngquant'|'$ROOT/$TOOLCHAIN/bin/pngquant'|g' -i support/mkbundle
   rm -rf .git
   cd $ROOT
 }
@@ -51,6 +52,7 @@ PKG_CONFIGURE_OPTS_TARGET="--prefix=/usr \
                            --enable-timeshift \
                            --enable-epoll \
                            --enable-inotify \
+                           --enable-pngquant \
                            --nowerror \
                            --python=$ROOT/$TOOLCHAIN/bin/python"
 
@@ -65,6 +67,7 @@ pre_configure_target() {
 
 post_make_target() {
   $CC -O -fbuiltin -fomit-frame-pointer -fPIC -shared -o capmt_ca.so src/extra/capmt_ca.c -ldl
+  $STRIP $ROOT/$PKG_BUILD/build.linux/tvheadend
 }
 
 post_makeinstall_target() {
@@ -83,6 +86,7 @@ post_makeinstall_target() {
     cp -a data/dvb-scan/dvb-s $INSTALL/usr/config/tvheadend/dvb-scan
     cp -a data/dvb-scan/dvb-t $INSTALL/usr/config/tvheadend/dvb-scan
     cp -a data/dvb-scan/isdb-t $INSTALL/usr/config/tvheadend/dvb-scan
+  #config
     cp -a $PKG_DIR/config/* $INSTALL/usr/config/tvheadend
 }
 
