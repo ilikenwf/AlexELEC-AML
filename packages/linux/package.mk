@@ -125,8 +125,12 @@ make_target() {
   rm -f $INSTALL/lib/modules/*/source
 
   ( cd $ROOT
+    if ls $PROJECT_DIR/$PROJECT/devices/$DEVICE/splash/splash-*.png 1>/dev/null 2>&1; then
+      rm -rf $ROOT/$BUILD/plymouth-lite-*
+    elif ls $PROJECT_DIR/$PROJECT/splash/splash-*.png 1>/dev/null 2>&1; then
+      rm -rf $ROOT/$BUILD/plymouth-lite-*
+    fi
     rm -rf $ROOT/$BUILD/initramfs
-    rm -rf $ROOT/$BUILD/plymouth-lite-*
     $SCRIPTS/install initramfs
   )
 
