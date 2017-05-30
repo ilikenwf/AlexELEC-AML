@@ -1,0 +1,93 @@
+From f31e1da4ccbed18f94127406495d0ffa42371047 Mon Sep 17 00:00:00 2001
+From: Richard Genoud <richard.genoud@gmail.com>
+Date: Wed, 22 Feb 2017 10:16:12 +0100
+Subject: [PATCH] implement disp_cap override/fallback and cvbs support on
+ amlogic
+
+This implement cvbs support for amlogic processor.
+cf: https://github.com/OpenELEC/OpenELEC.tv/issues/4502
+
+This patch (originaly from hitn) add the CVBS as a fallback (or override).
+
+Signed-off-by: Richard Genoud <richard.genoud@gmail.com>
+---
+ xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp | 52 +++++++++++++++++++++++++----
+ 1 file changed, 46 insertions(+), 6 deletions(-)
+
+diff --git a/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp b/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
+index 88cd385842df..12817888b971 100644
+--- a/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
++++ b/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
+@@ -23,6 +23,8 @@
+ #include "utils/AMLUtils.h"
+ #include "utils/StringUtils.h"
+ #include "utils/SysfsUtils.h"
++#include "utils/log.h"
++#include "filesystem/SpecialProtocol.h"
+ 
+ #include <stdio.h>
+ #include <stdlib.h>
+@@ -141,19 +143,57 @@ bool CEGLNativeTypeAmlogic::SetNativeResolution(const RESOLUTION_INFO &res)
+   }
+ #endif
+ 
++  std::string current_mode;
++  SysfsUtils::GetString("/sys/class/display/mode", current_mode);
++
++  std::string wanted_mode;
++  if (res.iScreenWidth == 720 && !aml_IsHdmiConnected())
++    // CVBS modes are 480cvbs or 576cvbs
++    wanted_mode = std::to_string(res.iScreenHeight) + "cvbs";
++  else
++    wanted_mode = res.strId;
++
+   // Don't set the same mode as current
+-  std::string mode;
+-  SysfsUtils::GetString("/sys/class/display/mode", mode);
+-  if (res.strId == mode)
++  if (wanted_mode == current_mode)
+     return false;
+ 
+-  return SetDisplayResolution(res.strId.c_str());
++  return SetDisplayResolution(wanted_mode.c_str());
+ }
+ 
+ bool CEGLNativeTypeAmlogic::ProbeResolutions(std::vector<RESOLUTION_INFO> &resolutions)
+ {
+-  std::string valstr;
+-  SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/disp_cap", valstr);
++  std::string valstr, overridefile, fallbackfile;
++  overridefile = CSpecialProtocol::TranslatePath("special://home/userdata/cvbs_override");
++  fallbackfile = CSpecialProtocol::TranslatePath("special://home/userdata/cvbs_fallback");
++
++  valstr = "";
++
++  if (SysfsUtils::Has(overridefile))
++  {
++    CLog::Log(LOGNOTICE, "Found file 'cvbs_override': Values for display capabilities will override any driver information.");
++    if (SysfsUtils::GetString(overridefile, valstr) < 0)
++      valstr = "";
++    if (valstr.length() == 0)
++      CLog::Log(LOGWARNING, "'cvbs_override' did not contain any information.");
++  }
++
++  if (valstr.length() == 0)
++  {
++    if (SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/disp_cap", valstr) < 0)
++      valstr = "";
++    if (valstr.length() == 0)
++      CLog::Log(LOGWARNING, "Driver did not report any display capabilities.");
++  }
++
++  if ((valstr.length() == 0) && (SysfsUtils::Has(fallbackfile)))
++  {
++    CLog::Log(LOGNOTICE, "Found file 'cvbs_fallback': Fallback values for display capabilities will be used since driver does not deliver any information.");
++    if (SysfsUtils::GetString(fallbackfile, valstr) < 0)
++      valstr = "";
++    if (valstr.length() == 0)
++      CLog::Log(LOGWARNING, "'cvbs_fallback' did not contain any information.");
++  }
++
+   std::vector<std::string> probe_str = StringUtils::Split(valstr, "\n");
+ 
+   resolutions.clear();
