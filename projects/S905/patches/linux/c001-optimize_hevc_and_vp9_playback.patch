@@ -1,0 +1,24 @@
+diff -Naurp linux-0d8dd61/drivers/amlogic/amports/vh265.c linux-0d8dd61-patch/drivers/amlogic/amports/vh265.c
+--- linux-0d8dd61/drivers/amlogic/amports/vh265.c	2017-05-16 23:42:32.000000000 +0300
++++ linux-0d8dd61-patch/drivers/amlogic/amports/vh265.c	2017-05-31 08:28:37.000000000 +0300
+@@ -268,7 +268,7 @@ static u32 dynamic_buf_num_margin;
+ #else
+ static u32 buf_alloc_width;
+ static u32 buf_alloc_height;
+-static u32 dynamic_buf_num_margin = 10;
++static u32 dynamic_buf_num_margin = 16;
+ #endif
+ static u32 max_buf_num = 16;
+ static u32 buf_alloc_size;
+diff -Naurp linux-0d8dd61/drivers/amlogic/amports/vvp9.c linux-0d8dd61-patch/drivers/amlogic/amports/vvp9.c
+--- linux-0d8dd61/drivers/amlogic/amports/vvp9.c	2017-05-16 23:42:32.000000000 +0300
++++ linux-0d8dd61-patch/drivers/amlogic/amports/vvp9.c	2017-05-31 08:28:56.000000000 +0300
+@@ -1899,7 +1899,7 @@ static u32 dynamic_buf_num_margin;
+ #else
+ static u32 buf_alloc_width;
+ static u32 buf_alloc_height;
+-static u32 dynamic_buf_num_margin = 7;
++static u32 dynamic_buf_num_margin = 16;
+ #endif
+ static u32 buf_alloc_depth = 10;
+ static u32 buf_alloc_size;

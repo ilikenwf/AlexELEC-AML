@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <advancedsettings>
+  <!-- <loglevel hide="false">2</loglevel> -->
   <splash>false</splash>
   <samba>
     <clienttimeout>30</clienttimeout>
