@@ -4,8 +4,8 @@
 ################################################################################
 
 PKG_NAME="kodi"
-GIT_VERSION="a5f9821"
-PKG_VERSION="17.2-rc1-$GIT_VERSION"
+GIT_VERSION="147cec4"
+PKG_VERSION="17.3-$GIT_VERSION"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
@@ -363,6 +363,11 @@ post_makeinstall_target() {
 
   if [ -d $PKG_DIR/config/pvr.hts ]; then
       cp -R $PKG_DIR/config/pvr.hts $INSTALL/usr/share/kodi/config
+  fi
+
+# install AV-output (cvbs)
+  if [ -f $PKG_DIR/config/cvbs_fallback ]; then
+      cp -R $PKG_DIR/config/cvbs_fallback $INSTALL/usr/share/kodi/config
   fi
 
   debug_strip $INSTALL/usr/lib/kodi/kodi.bin

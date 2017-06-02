@@ -74,6 +74,15 @@ if [ ! -f $HOME/.kodi/userdata/keymaps/keyboard.xml ] ; then
   cp /usr/share/kodi/system/keymaps/keyboard.xml $HOME/.kodi/userdata/keymaps
 fi
 
+# set AV-output (cvbs)
+if [ ! -f $HOME/.kodi/userdata/cvbs_present ] ; then
+  touch $HOME/.kodi/userdata/cvbs_present
+  if [ -f /usr/share/kodi/config/cvbs_fallback ]; then
+    cp -f /usr/share/kodi/config/cvbs_fallback $HOME/.kodi/userdata
+    cp -f /usr/share/kodi/config/cvbs_fallback $HOME/.kodi/userdata/cvbs_override.sample
+  fi
+fi
+
 KODI_ARGS="--lircdev /run/lirc/lircd"
 
 echo "KODI_ARGS=\"$KODI_ARGS\"" > /run/alexelec/kodi.conf

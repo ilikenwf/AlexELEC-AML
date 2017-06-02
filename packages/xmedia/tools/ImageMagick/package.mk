@@ -4,7 +4,7 @@
 ################################################################################
 
 PKG_NAME="ImageMagick"
-PKG_VERSION="7.0.5-5"
+PKG_VERSION="7.0.5-9"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
