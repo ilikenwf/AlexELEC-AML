@@ -10,27 +10,6 @@ diff -Naurp kodi-17.3-147cec4/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp kodi-1
  
  #include <stdio.h>
  #include <stdlib.h>
-@@ -153,10 +155,17 @@ bool CEGLNativeTypeAmlogic::SetNativeRes
- #endif
- 
-   // Don't set the same mode as current
--  RESOLUTION_INFO current_resolution;
-+  RESOLUTION_INFO current_resolution, wanted_resolution;
-   GetNativeResolution(&current_resolution);
--  if (current_resolution.strId != res.strId ||
--    current_resolution.fRefreshRate != res.fRefreshRate)
-+
-+  if (res.iScreenWidth == 720 && !aml_IsHdmiConnected())
-+    // CVBS modes are 480cvbs or 576cvbs
-+    wanted_resolution.strId = std::to_string(res.iScreenHeight) + "cvbs";
-+  else
-+    wanted_resolution = current_resolution;
-+
-+  if (wanted_resolution.strId != res.strId ||
-+    wanted_resolution.fRefreshRate != res.fRefreshRate)
-     result = SetDisplayResolution(res);
- 
-   DealWithScale(res);
 @@ -166,8 +175,38 @@ bool CEGLNativeTypeAmlogic::SetNativeRes
  
  bool CEGLNativeTypeAmlogic::ProbeResolutions(std::vector<RESOLUTION_INFO> &resolutions)
