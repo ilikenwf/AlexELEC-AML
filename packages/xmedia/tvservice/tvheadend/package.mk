@@ -4,12 +4,12 @@
 ################################################################################
 
 PKG_NAME="tvheadend"
-PKG_VERSION="76dbc3e"
+PKG_VERSION="60e4409"
 PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.tvheadend.org"
-PKG_URL=""
+PKG_URL="none"
 PKG_DEPENDS_TARGET="toolchain curl libdvbcsa libiconv libressl pngquant:host Python:host yasm jq"
 PKG_SECTION="xmedia/tvservice"
 PKG_SHORTDESC="Tvheadend: a TV streaming server for Linux supporting DVB-S, DVB-S2, DVB-C, DVB-T, ATSC, IPTV, and Analog video (V4L) as input sources."
