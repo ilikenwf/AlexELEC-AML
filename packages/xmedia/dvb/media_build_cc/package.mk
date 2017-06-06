@@ -4,7 +4,7 @@
 ################################################################################
 
 PKG_NAME="media_build_cc"
-PKG_VERSION="20170508"
+PKG_VERSION="20170606"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
@@ -30,6 +30,12 @@ pre_make_target() {
 }
 
 make_target() {
+  # internal tuner driver avl6862
+  if [ -d $PROJECT_DIR/$PROJECT/devices/$DEVICE/dvb_tv ]; then
+    cp -a $PROJECT_DIR/$PROJECT/devices/$DEVICE/dvb_tv linux/drivers/media
+    echo "obj-y += dvb_tv/" >> linux/drivers/media/Makefile
+  fi
+
   make VER=$KERNEL_VER SRCDIR=$(kernel_path) stagingconfig
   make VER=$KERNEL_VER SRCDIR=$(kernel_path)
 }

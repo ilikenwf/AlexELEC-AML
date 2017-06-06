@@ -7,4 +7,3 @@ aml-objs=aml_dvb.o aml_dmx.o
 
 EXTRA_CFLAGS += -I.
 EXTRA_CFLAGS += -Idrivers/media/dvb-core -Idrivers/media/usb/dvb-usb -Idrivers/media/dvb-frontends -Idrivers/media/tuners
-
