@@ -1,5 +1,2 @@
 # Kernel extra targets to build
   KERNEL_UBOOT_EXTRA_TARGET="meson8b_m201C_512M.dtd meson8b_m201C_512M.dtb"
-
-# build with swap support (yes / no)
-  SWAP_SUPPORT="yes"
