@@ -4,12 +4,12 @@
 ################################################################################
 
 PKG_NAME="ImageMagick"
-PKG_VERSION="7.0.5-9"
+PKG_VERSION="7.0.5-10"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.imagemagick.org"
-PKG_URL="http://www.imagemagick.org/download/releases/$PKG_NAME-$PKG_VERSION.tar.xz"
+PKG_URL="https://github.com/ImageMagick/ImageMagick/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain libX11"
 PKG_SECTION="xmedia/tools"
 PKG_SHORTDESC="image manipulation library"
