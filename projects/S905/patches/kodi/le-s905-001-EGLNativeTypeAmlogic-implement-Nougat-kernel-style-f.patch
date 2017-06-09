@@ -73,7 +73,7 @@ index 3cbb604..6921be4 100644
    }
    return resolutions.size() > 0;
  
-@@ -190,14 +207,18 @@ bool CEGLNativeTypeAmlogic::ShowWindow(bool show)
+@@ -190,14 +207,22 @@ bool CEGLNativeTypeAmlogic::ShowWindow(bool show)
    return true;
  }
  
@@ -82,9 +82,13 @@ index 3cbb604..6921be4 100644
  {
 -  std::string mode = resolution;
 +  std::string mode = res.strId.c_str();
++  std::string cur_mode;
 +
    // switch display resolution
-+  SysfsUtils::SetString("/sys/class/display/mode", "null");
++  SysfsUtils::GetString("/sys/class/display/mode", cur_mode);
++
++  if (cur_mode == mode)
++    SysfsUtils::SetString("/sys/class/display/mode", "null");
 +
 +  int fractional_rate = (res.fRefreshRate == floor(res.fRefreshRate)) ? 0 : 1;
 +  SysfsUtils::SetInt("/sys/class/amhdmitx/amhdmitx0/frac_rate_policy", fractional_rate);
