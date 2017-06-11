@@ -4,7 +4,7 @@
 ################################################################################
 
 PKG_NAME="libressl"
-PKG_VERSION="2.3.8"
+PKG_VERSION="2.4.4"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="BSD"
@@ -19,18 +19,7 @@ PKG_IS_ADDON="no"
 PKG_USE_CMAKE="no"
 PKG_AUTORECONF="yes"
 
-SSL_CERTIFICATES="/etc/ssl"
-
-post_makeinstall_target() {
-  # create new cert: perl ./mk-ca-bundle.pl
-  mkdir -p $INSTALL/$SSL_CERTIFICATES
-    cp $PKG_DIR/cert/ca-bundle.crt $INSTALL/$SSL_CERTIFICATES/cacert.pem
-  # backwards comatibility
-  mkdir -p $INSTALL/etc/pki/tls
-    ln -sf $SSL_CERTIFICATES/cacert.pem $INSTALL/etc/pki/tls/cacert.pem
-    ln -sf $SSL_CERTIFICATES/cacert.pem $INSTALL/etc/ssl/cert.pem
-  # for VDR-LIVE
-  mkdir -p $INSTALL/usr/config/ssl
-    cp $PKG_DIR/config/openssl.cnf $INSTALL/usr/config/ssl
-    ln -sf /storage/.config/ssl/openssl.cnf $INSTALL/etc/ssl/openssl.cnf
+makeinstall_target() {
+  mkdir -p $INSTALL/usr/lib
+  cp */.libs/*.so.?? $INSTALL/usr/lib/
 }
