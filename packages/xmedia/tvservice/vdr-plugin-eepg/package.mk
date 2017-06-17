@@ -4,7 +4,7 @@
 ################################################################################
 
 PKG_NAME="vdr-plugin-eepg"
-PKG_VERSION="9cd9a75"
+PKG_VERSION="584d766"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
