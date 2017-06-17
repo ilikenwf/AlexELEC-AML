@@ -1,0 +1,25 @@
+# oscam.server generated automatically by Streamboard OSCAM 1.20-unstable_svn SVN r0
+# Read more: http://www.streamboard.tv/svn/oscam/trunk/Distribution/doc/txt/oscam.server.txt
+
+[reader]
+label                         = HTB
+protocol                      = newcamd
+device                        = host,port
+key                           = 0102030405060708091011121314
+user                          = user
+password                      = password
+inactivitytimeout             = 20
+reconnecttimeout              = 10
+keepalive                     = 1
+caid                          = 0500
+group                         = 1
+audisabled                    = 1
+
+[reader]
+label                         = BISS
+protocol                      = constcw
+device                        = /storage/.config/oscam/config/constant.cw
+caid                          = 2600
+group                         = 2
+audisabled                    = 1
+
