@@ -1,0 +1,69 @@
+--- vdr-2.3.2-vanilla/channels.h	2015-08-17 12:39:48.000000000 +0300
++++ vdr-2.3.2-avcdescriptor/channels.h	2017-01-05 14:44:47.895941107 +0200
+@@ -120,6 +120,7 @@
+   int rid;
+   int lcn;       // Logical channel number assigned by data stream (or -1 if not available)
+   int number;    // Sequence number assigned on load
++  bool mode3d;
+   bool groupSep;
+   int __EndData__;
+   mutable cString nameSource;
+@@ -179,6 +180,8 @@
+   const char *Parameters(void) const { return parameters; }
+   const cLinkChannels* LinkChannels(void) const { return linkChannels; }
+   const cChannel *RefChannel(void) const { return refChannel; }
++  bool Set3DMode(bool Mode) { bool Modified = mode3d != Mode; mode3d = Mode; return Modified; }
++  bool Is3DMode(void) const { return mode3d; }
+   bool IsAtsc(void) const { return cSource::IsAtsc(source); }
+   bool IsCable(void) const { return cSource::IsCable(source); }
+   bool IsSat(void) const { return cSource::IsSat(source); }
+--- vdr-2.3.2-vanilla/pat.c	2016-12-23 16:02:07.000000000 +0200
++++ vdr-2.3.2-avcdescriptor/pat.c	2017-01-05 14:47:34.320932318 +0200
+@@ -405,6 +405,7 @@
+             }
+         // Scan the stream-specific loop:
+         SI::PMT::Stream stream;
++        bool Vis3dMode = false;
+         int Vpid = 0;
+         int Ppid = 0;
+         int Vtype = 0;
+@@ -427,14 +428,31 @@
+             bool ProcessCaDescriptors = false;
+             int esPid = stream.getPid();
+             switch (stream.getStreamType()) {
++              case 0x1C: // Frame compatible plano-stereoscopic HD digital television service
++                      Vis3dMode = true;
+               case 1: // STREAMTYPE_11172_VIDEO
+               case 2: // STREAMTYPE_13818_VIDEO
+               case 0x1B: // H.264
+               case 0x24: // H.265
++                      {
+                       Vpid = esPid;
+                       Ppid = pmt.getPCRPid();
+                       Vtype = stream.getStreamType();
++                      SI::Descriptor *d;
++                      for (SI::Loop::Iterator it; (d = stream.streamDescriptors.getNext(it)); ) {
++                          switch (d->getDescriptorTag()) {
++                            case SI::AVCDescriptorTag: {
++                                 SI::AVCDescriptor *ad = (SI::AVCDescriptor *)d;
++                                 if (!ad->getFramePackingSEINotPresentFlag())
++                                    Vis3dMode = true;
++                                 }
++                                 break;
++                            default: ;
++                            }
++                          delete d;
++                          }
+                       ProcessCaDescriptors = true;
++                      }
+                       break;
+               case 3: // STREAMTYPE_11172_AUDIO
+               case 4: // STREAMTYPE_13818_AUDIO
+@@ -628,6 +646,7 @@
+            ChannelsModified |= Channel->SetCaIds(CaDescriptors->CaIds());
+            ChannelsModified |= Channel->SetSubtitlingDescriptors(SubtitlingTypes, CompositionPageIds, AncillaryPageIds);
+            }
++        ChannelsModified |= Channel->Set3DMode(Vis3dMode);
+         ChannelsModified |= Channel->SetCaDescriptors(CaDescriptorHandler.AddCaDescriptors(CaDescriptors));
+         }
+      StateKey.Remove(ChannelsModified);

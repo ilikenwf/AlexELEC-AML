@@ -1,7 +1,6 @@
-diff -Naurp vdr-2.2.0/config.c vdr-2.2.0-patch/config.c
---- vdr-2.2.0/config.c	2016-08-21 14:36:12.000000000 +0300
-+++ vdr-2.2.0-patch/config.c	2016-08-21 17:05:12.000000000 +0300
-@@ -396,6 +396,9 @@ cSetup::cSetup(void)
+--- vdr-2.3.2/config.c.orig	2017-03-16 19:07:06.037123593 +0100
++++ vdr-2.3.2/config.c	2017-03-16 19:10:02.846918131 +0100
+@@ -395,6 +395,9 @@
    PositionerSpeed = 15;
    PositionerSwing = 650;
    PositionerLastLon = 0;
@@ -10,8 +9,8 @@ diff -Naurp vdr-2.2.0/config.c vdr-2.2.0-patch/config.c
 +  PowerdownWakeupH = 4;
    SetSystemTime = 0;
    TimeSource = 0;
-   ChannelBlocker = 0;
-@@ -625,6 +628,9 @@ bool cSetup::Parse(const char *Name, con
+   TimeTransponder = 0;
+@@ -627,6 +630,9 @@
    else if (!strcasecmp(Name, "PositionerSpeed"))     PositionerSpeed    = atoi(Value);
    else if (!strcasecmp(Name, "PositionerSwing"))     PositionerSwing    = atoi(Value);
    else if (!strcasecmp(Name, "PositionerLastLon"))   PositionerLastLon  = atoi(Value);
@@ -21,7 +20,7 @@ diff -Naurp vdr-2.2.0/config.c vdr-2.2.0-patch/config.c
    else if (!strcasecmp(Name, "SetSystemTime"))       SetSystemTime      = atoi(Value);
    else if (!strcasecmp(Name, "TimeSource"))          TimeSource         = cSource::FromString(Value);
    else if (!strcasecmp(Name, "TimeTransponder"))     TimeTransponder    = atoi(Value);
-@@ -758,6 +764,9 @@ bool cSetup::Save(void)
+@@ -763,6 +769,9 @@
    Store("PositionerSpeed",    PositionerSpeed);
    Store("PositionerSwing",    PositionerSwing);
    Store("PositionerLastLon",  PositionerLastLon);
@@ -31,10 +30,9 @@ diff -Naurp vdr-2.2.0/config.c vdr-2.2.0-patch/config.c
    Store("SetSystemTime",      SetSystemTime);
    Store("TimeSource",         cSource::ToString(TimeSource));
    Store("TimeTransponder",    TimeTransponder);
-diff -Naurp vdr-2.2.0/config.h vdr-2.2.0-patch/config.h
---- vdr-2.2.0/config.h	2016-08-21 14:36:12.000000000 +0300
-+++ vdr-2.2.0-patch/config.h	2016-08-21 17:06:01.000000000 +0300
-@@ -280,6 +280,9 @@ public:
+--- vdr-2.3.2/config.h.orig	2017-03-16 19:07:06.037123593 +0100
++++ vdr-2.3.2/config.h	2017-03-16 19:10:02.846918131 +0100
+@@ -277,6 +277,9 @@
    int PositionerSpeed;
    int PositionerSwing;
    int PositionerLastLon;
@@ -44,10 +42,9 @@ diff -Naurp vdr-2.2.0/config.h vdr-2.2.0-patch/config.h
    int SetSystemTime;
    int TimeSource;
    int TimeTransponder;
-diff -Naurp vdr-2.2.0/device.c vdr-2.2.0-patch/device.c
---- vdr-2.2.0/device.c	2016-08-21 14:36:12.000000000 +0300
-+++ vdr-2.2.0-patch/device.c	2016-08-21 17:08:38.000000000 +0300
-@@ -108,6 +108,9 @@ cDevice::cDevice(void)
+--- vdr-2.3.2/device.c.orig	2016-12-23 15:43:44.000000000 +0100
++++ vdr-2.3.2/device.c	2017-03-16 19:18:45.856373219 +0100
+@@ -103,6 +103,9 @@
    dvbSubtitleConverter = NULL;
    autoSelectPreferredSubtitleLanguage = true;
  
@@ -57,28 +54,26 @@ diff -Naurp vdr-2.2.0/device.c vdr-2.2.0-patch/device.c
    for (int i = 0; i < MAXRECEIVERS; i++)
        receiver[i] = NULL;
  
-@@ -749,6 +752,11 @@ bool cDevice::SwitchChannel(int Directio
+@@ -832,6 +835,10 @@
+      }
    return result;
  }
- 
 +// While switching to a channel, the device will be kept powered up
 +// for at least this number of seconds before a receiver is attached.
 +// Must be less than cEITScanner::ScanTimeout.
 +#define CHANNEL_SWITCH_POWERUP_TIMEOUT  10
-+
+ 
  eSetChannelResult cDevice::SetChannel(const cChannel *Channel, bool LiveView)
  {
-   // I hope 'LiveView = false' indicates a channel switch for recording, // PIN PATCH
-@@ -789,6 +797,8 @@ eSetChannelResult cDevice::SetChannel(co
+@@ -873,6 +880,7 @@
+         Result = scrNotAvailable;
       }
    else {
-      Channels.Lock(false);
-+     // Power up the device
-+     PowerUp(CHANNEL_SWITCH_POWERUP_TIMEOUT);
++	PowerUp(CHANNEL_SWITCH_POWERUP_TIMEOUT);
       // Stop section handling:
       if (sectionHandler) {
          sectionHandler->SetStatus(false);
-@@ -854,8 +864,11 @@ int cDevice::Occupied(void) const
+@@ -938,8 +946,11 @@
  
  void cDevice::SetOccupied(int Seconds)
  {
@@ -91,15 +86,15 @@ diff -Naurp vdr-2.2.0/device.c vdr-2.2.0-patch/device.c
  }
  
  bool cDevice::SetChannelDevice(const cChannel *Channel, bool LiveView)
-@@ -1705,6 +1718,7 @@ bool cDevice::AttachReceiver(cReceiver *
-             startScrambleDetection = time(NULL);
+@@ -1796,6 +1807,7 @@
+                }
              }
           Start();
-+         SetIdleTimer(false);
++	  SetIdleTimer(false);
           return true;
           }
        }
-@@ -1738,8 +1752,10 @@ void cDevice::Detach(cReceiver *Receiver
+@@ -1829,8 +1841,10 @@
             camSlot->Assign(NULL);
          }
       }
@@ -107,14 +102,14 @@ diff -Naurp vdr-2.2.0/device.c vdr-2.2.0-patch/device.c
 +  if (!receiversLeft) {
       Cancel(-1);
 +     SetIdleTimer(true);
-+     }
++  }
  }
  
  void cDevice::DetachAll(int Pid)
-@@ -1761,6 +1777,82 @@ void cDevice::DetachAllReceivers(void)
-       Detach(receiver[i]);
+@@ -1894,6 +1908,81 @@
+            }
+      }
  }
- 
 +void cDevice::CheckIdle(void)
 +{
 +  if (!SupportsPowerDown() || !Setup.PowerdownEnabled)
@@ -190,14 +185,12 @@ diff -Naurp vdr-2.2.0/device.c vdr-2.2.0-patch/device.c
 +  if (SupportsPowerDown() && IsPoweredDown())
 +     PowerDown(false);
 +}
-+
- cRecorder* cDevice::GetPreRecording(const cChannel *Channel)
+ 
+ uchar *cTSBuffer::Get(int *Available, bool CheckAvailable)
  {
-   cMutexLock MutexLock(&mutexReceiver);
-diff -Naurp vdr-2.2.0/device.h vdr-2.2.0-patch/device.h
---- vdr-2.2.0/device.h	2016-08-21 14:36:12.000000000 +0300
-+++ vdr-2.2.0-patch/device.h	2016-08-21 13:56:34.000000000 +0300
-@@ -830,6 +830,35 @@ public:
+--- vdr-2.3.2/device.h.orig	2017-03-16 19:07:06.113122646 +0100
++++ vdr-2.3.2/device.h	2017-03-16 19:10:02.846918131 +0100
+@@ -859,6 +859,35 @@
         ///< Detaches all receivers from this device for this pid.
    virtual void DetachAllReceivers(void);
         ///< Detaches all receivers from this device.
@@ -233,19 +226,18 @@ diff -Naurp vdr-2.2.0/device.h vdr-2.2.0-patch/device.h
    };
  
  /// Derived cDevice classes that can receive channels will have to provide
-diff -Naurp vdr-2.2.0/dvbdevice.c vdr-2.2.0-patch/dvbdevice.c
---- vdr-2.2.0/dvbdevice.c	2016-08-21 14:36:12.000000000 +0300
-+++ vdr-2.2.0-patch/dvbdevice.c	2016-08-21 14:02:31.000000000 +0300
-@@ -350,6 +350,8 @@ public:
-   const cPositioner *Positioner(void) const { return positioner; }
+--- vdr-2.3.2/dvbdevice.c.orig	2016-11-07 14:55:58.000000000 +0100
++++ vdr-2.3.2/dvbdevice.c	2017-03-16 19:20:10.499312232 +0100
+@@ -352,6 +352,8 @@
+   bool GetSignalStats(int &Valid, double *Strength = NULL, double *Cnr = NULL, double *BerPre = NULL, double *BerPost = NULL, double *Per = NULL, int *Status = NULL) const;
    int GetSignalStrength(void) const;
    int GetSignalQuality(void) const;
 +  bool IsPoweredDown(void) {return fd_frontend < 0;}
 +  void PowerDown(bool On);
-   bool SendDiseqcCmd(dvb_diseqc_master_cmd cmd);
- private:
-   int GetCurrentDeliverySystem(void);
-@@ -550,6 +552,8 @@ void cDvbTuner::ClearEventQueue(void) co
+   };
+ 
+ cMutex cDvbTuner::bondMutex;
+@@ -551,6 +553,8 @@
  
  bool cDvbTuner::GetFrontendStatus(fe_status_t &Status) const
  {
@@ -254,16 +246,16 @@ diff -Naurp vdr-2.2.0/dvbdevice.c vdr-2.2.0-patch/dvbdevice.c
    ClearEventQueue();
    while (1) {
          if (ioctl(fd_frontend, FE_READ_STATUS, &Status) != -1)
-@@ -565,6 +569,8 @@ bool cDvbTuner::GetFrontendStatus(fe_sta
+@@ -576,6 +580,8 @@
  
- int cDvbTuner::GetSignalStrength(void) const
+ bool cDvbTuner::GetSignalStats(int &Valid, double *Strength, double *Cnr, double *BerPre, double *BerPost, double *Per, int *Status) const
  {
 +  if (fd_frontend < 0)
 +     return -1;
    ClearEventQueue();
-   uint16_t Signal;
-   while (1) {
-@@ -1041,6 +1047,26 @@ void cDvbTuner::Action(void)
+   fe_status_t FeStatus;
+   dtv_property Props[MAXFRONTENDCMDS];
+@@ -1225,6 +1231,26 @@
          }
  }
  
@@ -290,7 +282,7 @@ diff -Naurp vdr-2.2.0/dvbdevice.c vdr-2.2.0-patch/dvbdevice.c
  // --- cDvbSourceParam -------------------------------------------------------
  
  class cDvbSourceParam : public cSourceParam {
-@@ -1760,6 +1786,19 @@ void cDvbDevice::DetachAllReceivers(void
+@@ -1954,6 +1980,19 @@
    needsDetachBondedReceivers = false;
  }
  
@@ -310,10 +302,9 @@ diff -Naurp vdr-2.2.0/dvbdevice.c vdr-2.2.0-patch/dvbdevice.c
  // --- cDvbDeviceProbe -------------------------------------------------------
  
  cList<cDvbDeviceProbe> DvbDeviceProbes;
-diff -Naurp vdr-2.2.0/dvbdevice.h vdr-2.2.0-patch/dvbdevice.h
---- vdr-2.2.0/dvbdevice.h	2016-08-21 14:36:12.000000000 +0300
-+++ vdr-2.2.0-patch/dvbdevice.h	2016-08-21 14:03:44.000000000 +0300
-@@ -290,6 +290,13 @@ protected:
+--- vdr-2.3.2/dvbdevice.h.orig	2015-04-18 15:57:27.000000000 +0200
++++ vdr-2.3.2/dvbdevice.h	2017-03-16 19:10:02.850918081 +0100
+@@ -292,6 +292,13 @@
    virtual void CloseDvr(void);
    virtual bool GetTSPacket(uchar *&Data);
    virtual void DetachAllReceivers(void);
@@ -327,10 +318,9 @@ diff -Naurp vdr-2.2.0/dvbdevice.h vdr-2.2.0-patch/dvbdevice.h
    };
  
  // A plugin that implements a DVB device derived from cDvbDevice needs to create
-diff -Naurp vdr-2.2.0/eitscan.c vdr-2.2.0-patch/eitscan.c
---- vdr-2.2.0/eitscan.c	2016-08-21 14:36:12.000000000 +0300
-+++ vdr-2.2.0-patch/eitscan.c	2016-08-21 14:07:33.000000000 +0300
-@@ -142,7 +142,8 @@ void cEITScanner::Process(void)
+--- vdr-2.3.2/eitscan.c.orig	2015-09-10 13:05:03.000000000 +0200
++++ vdr-2.3.2/eitscan.c	2017-03-16 19:10:02.850918081 +0100
+@@ -144,7 +144,8 @@
             bool AnyDeviceSwitched = false;
             for (int i = 0; i < cDevice::NumDevices(); i++) {
                 cDevice *Device = cDevice::GetDevice(i);
@@ -339,8 +329,8 @@ diff -Naurp vdr-2.2.0/eitscan.c vdr-2.2.0-patch/eitscan.c
 +                     && (!Device->PoweredDown() || lastActivity == 0)) { // powered up or forced scan
                    for (cScanData *ScanData = scanList->First(); ScanData; ScanData = scanList->Next(ScanData)) {
                        const cChannel *Channel = ScanData->GetChannel();
-                       if (Channel && !cSource::IsType(Channel->Source(), 'I')) {
-@@ -159,6 +160,10 @@ void cEITScanner::Process(void)
+                       if (Channel) {
+@@ -165,6 +166,10 @@
                                             }
                                          }
                                       //dsyslog("EIT scan: device %d  source  %-8s tp %5d", Device->DeviceNumber() + 1, *cSource::ToString(Channel->Source()), Channel->Transponder());
@@ -351,23 +341,22 @@ diff -Naurp vdr-2.2.0/eitscan.c vdr-2.2.0-patch/eitscan.c
                                       Device->SwitchChannel(Channel, false);
                                       scanList->Del(ScanData);
                                       AnyDeviceSwitched = true;
-diff -Naurp vdr-2.2.0/menu.c vdr-2.2.0-patch/menu.c
---- vdr-2.2.0/menu.c	2016-08-21 14:36:12.000000000 +0300
-+++ vdr-2.2.0-patch/menu.c	2016-08-21 17:10:49.000000000 +0300
-@@ -3583,6 +3583,12 @@ void cMenuSetupLNB::Setup(void)
+--- vdr-2.3.2/menu.c.orig	2017-03-16 19:07:06.109122696 +0100
++++ vdr-2.3.2/menu.c	2017-03-16 19:10:02.850918081 +0100
+@@ -3788,6 +3788,12 @@
       Add(new cMenuEditIntxItem(tr("Setup.LNB$Positioner speed (degrees/s)"), &data.PositionerSpeed, 1, 1800, 10));
       }
  
 +  Add(new cMenuEditBoolItem(tr("Setup.LNB$Enable power saving"), &data.PowerdownEnabled));
 +  if (data.PowerdownEnabled) {
-+     Add(new cMenuEditIntItem(tr("Setup.LNB$Power down an idle device after (sec)"), &data.PowerdownTimeoutS));
++     Add(new cMenuEditIntItem(tr("Setup.LNB$Power down an idle device after (min)"), &data.PowerdownTimeoutS));
 +     Add(new cMenuEditIntItem(tr("Setup.LNB$Wake up from power-down after (h)"), &data.PowerdownWakeupH));
 +     }
 +
    SetCurrent(Get(current));
    Display();
  }
-@@ -3591,6 +3597,7 @@ eOSState cMenuSetupLNB::ProcessKey(eKeys
+@@ -3796,6 +3802,7 @@
  {
    int oldDiSEqC = data.DiSEqC;
    int oldUsePositioner = data.UsePositioner;
@@ -375,7 +364,7 @@ diff -Naurp vdr-2.2.0/menu.c vdr-2.2.0-patch/menu.c
    bool DeviceBondingsChanged = false;
    if (Key == kOk) {
       cString NewDeviceBondings = satCableNumbers.ToString();
-@@ -3599,7 +3606,7 @@ eOSState cMenuSetupLNB::ProcessKey(eKeys
+@@ -3804,7 +3811,7 @@
       }
    eOSState state = cMenuSetupBase::ProcessKey(Key);
  
@@ -384,10 +373,9 @@ diff -Naurp vdr-2.2.0/menu.c vdr-2.2.0-patch/menu.c
       Setup();
    else if (DeviceBondingsChanged)
       cDvbDevice::BondDevices(data.DeviceBondings);
-diff -Naurp vdr-2.2.0/vdr.c vdr-2.2.0-patch/vdr.c
---- vdr-2.2.0/vdr.c	2016-08-21 14:36:12.000000000 +0300
-+++ vdr-2.2.0-patch/vdr.c	2016-08-21 14:12:34.000000000 +0300
-@@ -1454,6 +1454,12 @@ int main(int argc, char *argv[])
+--- vdr-2.3.2/vdr.c.orig	2017-03-16 19:07:06.097122845 +0100
++++ vdr-2.3.2/vdr.c	2017-03-16 19:10:02.850918081 +0100
+@@ -1555,6 +1555,12 @@
  
          ReportEpgBugFixStats();
  

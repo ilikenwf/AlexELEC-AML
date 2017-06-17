@@ -4,12 +4,12 @@
 ################################################################################
 
 PKG_NAME="vdr"
-PKG_VERSION="2.2.0"
+PKG_VERSION="2.3.7"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.tvdr.de"
-PKG_URL="ftp://ftp.tvdr.de/vdr/$PKG_NAME-$PKG_VERSION.tar.bz2"
+PKG_URL="ftp://ftp.tvdr.de/vdr/Developer/$PKG_NAME-$PKG_VERSION.tar.bz2"
 PKG_DEPENDS_TARGET="toolchain fontconfig freetype libcap libjpeg-turbo bzip2"
 PKG_SECTION="xmedia/tvservice"
 PKG_SHORTDESC="vdr: A powerful DVB TV application"
@@ -48,6 +48,7 @@ EOF
 make_target() {
   make vdr
   make include-dir
+  make -C send
 }
 
 post_makeinstall_target() {
@@ -60,6 +61,8 @@ post_makeinstall_target() {
 
   mkdir -p $INSTALL/usr/bin
     cp $PKG_DIR/scripts/* $INSTALL/usr/bin
+    cp send/svdrpsend $INSTALL/usr/bin
+    $STRIP $INSTALL/usr/bin/svdrpsend
 }
 
 post_install() {

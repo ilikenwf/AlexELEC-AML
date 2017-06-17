@@ -1,7 +1,6 @@
-diff -Nru vdr-2.1.2-vanilla/osdbase.c vdr-2.1.2-menuselection/osdbase.c
---- vdr-2.1.2-vanilla/osdbase.c	2013-10-19 18:27:36.000000000 +0300
-+++ vdr-2.1.2-menuselection/osdbase.c	2013-10-19 18:35:12.236000000 +0300
-@@ -82,6 +82,7 @@
+--- vdr-2.3.2-vanilla/osdbase.c	2015-09-10 14:23:07.000000000 +0300
++++ vdr-2.3.2-menuselection/osdbase.c	2017-01-05 15:00:47.709890420 +0200
+@@ -83,6 +83,7 @@
  {
    isMenu = true;
    digit = 0;
@@ -9,7 +8,7 @@ diff -Nru vdr-2.1.2-vanilla/osdbase.c vdr-2.1.2-menuselection/osdbase.c
    hasHotkeys = false;
    displayMenuItems = 0;
    title = NULL;
-@@ -131,7 +132,7 @@
+@@ -141,7 +142,7 @@
          digit = -1; // prevents automatic hotkeys - input already has them
       if (digit >= 0) {
          digit++;
@@ -18,7 +17,7 @@ diff -Nru vdr-2.1.2-vanilla/osdbase.c vdr-2.1.2-menuselection/osdbase.c
          s = buffer;
          }
       }
-@@ -477,20 +478,60 @@
+@@ -491,20 +492,60 @@
       }
  }
  
@@ -82,7 +81,7 @@ diff -Nru vdr-2.1.2-vanilla/osdbase.c vdr-2.1.2-menuselection/osdbase.c
    return osContinue;
  }
  
-@@ -531,8 +572,8 @@
+@@ -545,8 +586,8 @@
          }
       }
    switch (int(Key)) {
@@ -91,12 +90,11 @@ diff -Nru vdr-2.1.2-vanilla/osdbase.c vdr-2.1.2-menuselection/osdbase.c
 +    case kNone:
 +    case k0...k9: return hasHotkeys ? HotKey(Key) : osUnknown;
      case kUp|k_Repeat:
-     case kUp:   CursorUp();   break;
+     case kUp:     if (menuOrientation == moHorizontal) PageUp();     else CursorUp(); break;
      case kDown|k_Repeat:
-diff -Nru vdr-2.1.2-vanilla/osdbase.h vdr-2.1.2-menuselection/osdbase.h
---- vdr-2.1.2-vanilla/osdbase.h	2013-10-19 18:27:36.004000000 +0300
-+++ vdr-2.1.2-menuselection/osdbase.h	2013-10-19 18:35:12.236000000 +0300
-@@ -98,6 +98,8 @@
+--- vdr-2.3.2-vanilla/osdbase.h	2015-09-10 14:17:52.000000000 +0300
++++ vdr-2.3.2-menuselection/osdbase.h	2017-01-05 15:00:47.710890420 +0200
+@@ -101,6 +101,8 @@
    char *status;
    int digit;
    bool hasHotkeys;
