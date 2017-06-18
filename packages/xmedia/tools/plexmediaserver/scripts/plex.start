@@ -9,7 +9,7 @@ export PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR="/storage/.config"
 export PLEX_MEDIA_SERVER_TMPDIR="$PLEX_MEDIA_SERVER_HOME/tmp"
 
 install_plex() {
-  kodi-send -a "Notification(Plex, wait for install..., 20000)"
+  kodi-send -a "Notification(Plex, wait for install..., 30000)"
   mkdir -p $PLEX_MEDIA_SERVER_TMPDIR
   cd $PLEX_MEDIA_SERVER_TMPDIR
   wget -q https://downloads.plex.tv/plex-media-server/$1/PlexMediaServer-$1-arm7.spk || exit 1
@@ -33,7 +33,7 @@ else
   if [ -n "$MAIN_JS" ]; then
     sed -i s'/validateTranscoder:function([a-zA-Z],[a-zA-Z]){/&return false;/' $MAIN_JS
   fi
-  kodi-send -a "Notification(Plex, starting..., 3000)"
+  kodi-send -a "Notification(Plex, installation completed. Starting..., 5000)"
 fi
 
 rm -rf $PLEX_MEDIA_SERVER_TMPDIR
