@@ -1,0 +1,10 @@
+[Unit]
+Description=HDMI connection monitor Kodi
+After=kodi.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/hdmi-monitor.start
+
+[Install]
+WantedBy=kodi.target
