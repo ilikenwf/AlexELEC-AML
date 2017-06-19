@@ -1,0 +1,36 @@
+diff -Naurp kodi-17.4-rc1-a234aa0/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp kodi-17.4-rc1-a234aa0-patch/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
+--- kodi-17.4-rc1-a234aa0/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp	2017-06-19 09:50:53.000000000 +0300
++++ kodi-17.4-rc1-a234aa0-patch/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp	2017-06-19 10:07:01.000000000 +0300
+@@ -23,6 +23,7 @@
+ #include "utils/AMLUtils.h"
+ #include "utils/StringUtils.h"
+ #include "utils/SysfsUtils.h"
++#include "filesystem/SpecialProtocol.h"
+ 
+ #include <stdio.h>
+ #include <stdlib.h>
+@@ -160,8 +161,22 @@ bool CEGLNativeTypeAmlogic::SetNativeRes
+ 
+ bool CEGLNativeTypeAmlogic::ProbeResolutions(std::vector<RESOLUTION_INFO> &resolutions)
+ {
+-  std::string valstr;
+-  SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/disp_cap", valstr);
++  std::string valstr, fallbackfile;
++  valstr = "";
++  fallbackfile = CSpecialProtocol::TranslatePath("special://home/userdata/cvbs_fallback");
++
++  if (valstr.length() == 0)
++  {
++    if (SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/disp_cap", valstr) < 0)
++      valstr = "";
++  }
++
++  if ((valstr.length() == 0) && (SysfsUtils::Has(fallbackfile)))
++  {
++    if (SysfsUtils::GetString(fallbackfile, valstr) < 0)
++      valstr = "";
++  }
++
+   std::vector<std::string> probe_str = StringUtils::Split(valstr, "\n");
+ 
+   resolutions.clear();

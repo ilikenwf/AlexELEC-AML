@@ -79,7 +79,6 @@ if [ ! -f $HOME/.kodi/userdata/cvbs_present ] ; then
   touch $HOME/.kodi/userdata/cvbs_present
   if [ -f /usr/share/kodi/config/cvbs_fallback ]; then
     cp -f /usr/share/kodi/config/cvbs_fallback $HOME/.kodi/userdata
-    cp -f /usr/share/kodi/config/cvbs_fallback $HOME/.kodi/userdata/cvbs_override.sample
   fi
 fi
 
