@@ -4,7 +4,7 @@
 ################################################################################
 
 PKG_NAME="Alexelec-settings"
-PKG_VERSION="6006cea"
+PKG_VERSION="03c6010"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="prop."
