@@ -1,6 +1,7 @@
 [Unit]
 Description=HDMI connection monitor Kodi
 After=kodi.service
+ConditionPathExists=/var/lock/start.kodi
 
 [Service]
 Type=simple
