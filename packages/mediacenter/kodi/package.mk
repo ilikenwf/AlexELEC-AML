@@ -264,8 +264,6 @@ post_makeinstall_target() {
     cp $PKG_DIR/scripts/nand-config.sh $INSTALL/usr/bin
 # Drop RAM service
     cp $PKG_DIR/scripts/drop-ram.start $INSTALL/usr/bin
-# HDMI monitor service
-    cp $PKG_DIR/scripts/hdmi-monitor.start $INSTALL/usr/bin
 
   mkdir -p $INSTALL/usr/share/kodi/addons
     cp -R $PKG_DIR/config/os.alexelec $INSTALL/usr/share/kodi/addons
@@ -394,6 +392,4 @@ post_install() {
   enable_service gui-switch.service
 # Drop RAM service
   enable_service drop-ram.service
-# HDMI monitor service
-  enable_service hdmi-monitor.service
 }
