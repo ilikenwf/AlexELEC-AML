@@ -4,13 +4,13 @@
 #      Copyright (C) 2011-2017 Alexandr Zuyev (alex@alexelec.in.ua)
 ################################################################################
 
-display_mode=$(cat /sys/class/display/mode)
+hdmimode="1080p50hz"
 
 # Parse command line arguments
 for arg in $(cat /proc/cmdline); do
   case ${arg} in
-    hdmitx=*)
-      hdmitx="${arg#*=}"
+    hdmimode=*)
+      hdmimode=${arg#*=}
       ;;
     bootfrom*)
       bootfromext=1
@@ -27,11 +27,6 @@ for arg in $(cat /proc/cmdline); do
   esac
 done
 
-# Force enable CEC if configuration parameter not present or empty
-if [ -z "$hdmitx" ]; then
-  echo 0xf > /sys/class/amhdmitx/amhdmitx0/cec_config
-fi
-
 # Add information where to run AlexELEC from
 if [ -z "$BOOT_IMAGE" -o -z "$boot" -o -z "$disk" ]; then
   cmdline=$(cat /proc/cmdline)
@@ -43,24 +38,27 @@ if [ -z "$BOOT_IMAGE" -o -z "$boot" -o -z "$disk" ]; then
   echo "$cmdline" > /proc/cmdline
 fi
 
+echo "$hdmimode" > /sys/class/display/mode
+
 # Enable framebuffer device
 echo 0 > /sys/class/graphics/fb0/blank
 
 # Blank fb1 to prevent static noise
 echo 1 > /sys/class/graphics/fb1/blank
 
-# Set framebuffer geometry to match the resolution
-case $display_mode in
-  480*)            X=720  Y=480  ;;
-  576*)            X=720  Y=576  ;;
-  720p*)           X=1280 Y=720  ;;
-  *)               X=1920 Y=1080 ;;
-esac
-
-fbset -fb /dev/fb0 -g $X $Y 1920 2160 32
-fbset -fb /dev/fb1 -g 32 32 32 32 32
+# Disable framebuffer scaling
 echo 0 > /sys/class/graphics/fb0/free_scale
 echo 0 > /sys/class/graphics/fb1/free_scale
+
+# Set framebuffer geometry to match the resolution
+case "$hdmimode" in
+  720*)
+    fbset -fb /dev/fb0 -g 1280 720 1920 2160 32
+    ;;
+  1080*)
+    fbset -fb /dev/fb0 -g 1920 1080 1920 2160 32
+    ;;
+esac
 
 # Include deinterlacer into default VFM map
 echo rm default > /sys/class/vfm/map
