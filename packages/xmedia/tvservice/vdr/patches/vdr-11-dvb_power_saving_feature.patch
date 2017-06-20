@@ -349,7 +349,7 @@
  
 +  Add(new cMenuEditBoolItem(tr("Setup.LNB$Enable power saving"), &data.PowerdownEnabled));
 +  if (data.PowerdownEnabled) {
-+     Add(new cMenuEditIntItem(tr("Setup.LNB$Power down an idle device after (min)"), &data.PowerdownTimeoutS));
++     Add(new cMenuEditIntItem(tr("Setup.LNB$Power down an idle device after (sec)"), &data.PowerdownTimeoutS));
 +     Add(new cMenuEditIntItem(tr("Setup.LNB$Wake up from power-down after (h)"), &data.PowerdownWakeupH));
 +     }
 +
