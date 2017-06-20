@@ -4,11 +4,15 @@
 #      Copyright (C) 2011-2017 Alexandr Zuyev (alex@alexelec.in.ua)
 ################################################################################
 
+hdmimode="1080p50hz"
 display_mode=$(cat /sys/class/display/mode)
 
 # Parse command line arguments
 for arg in $(cat /proc/cmdline); do
   case ${arg} in
+    hdmimode=*)
+      hdmimode=${arg#*=}
+      ;;
     bootfrom*)
       bootfromext=1
       ;;
@@ -23,6 +27,8 @@ for arg in $(cat /proc/cmdline); do
       ;;
   esac
 done
+
+[ -z "$display_mode" ] && display_mode=$hdmimode
 
 # Add information where to run AlexELEC from
 if [ -z "$BOOT_IMAGE" -o -z "$boot" -o -z "$disk" ]; then
