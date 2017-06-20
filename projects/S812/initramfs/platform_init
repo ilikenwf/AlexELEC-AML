@@ -4,13 +4,13 @@
 #      Copyright (C) 2011-2017 Alexandr Zuyev (alex@alexelec.in.ua)
 ################################################################################
 
-hdmimode="1080p50hz"
+display_mode=$(cat /sys/class/display/mode)
 
 # Parse command line arguments
 for arg in $(cat /proc/cmdline); do
   case ${arg} in
-    hdmimode=*)
-      hdmimode=${arg#*=}
+    hdmitx=*)
+      hdmitx="${arg#*=}"
       ;;
     bootfrom*)
       bootfromext=1
@@ -27,6 +27,11 @@ for arg in $(cat /proc/cmdline); do
   esac
 done
 
+# Force enable CEC if configuration parameter not present or empty
+if [ -z "$hdmitx" ]; then
+  echo 0xf > /sys/class/amhdmitx/amhdmitx0/cec_config
+fi
+
 # Add information where to run AlexELEC from
 if [ -z "$BOOT_IMAGE" -o -z "$boot" -o -z "$disk" ]; then
   cmdline=$(cat /proc/cmdline)
@@ -38,28 +43,19 @@ if [ -z "$BOOT_IMAGE" -o -z "$boot" -o -z "$disk" ]; then
   echo "$cmdline" > /proc/cmdline
 fi
 
-echo "$hdmimode" > /sys/class/display/mode
-
 # Enable framebuffer device
 echo 0 > /sys/class/graphics/fb0/blank
 
 # Blank fb1 to prevent static noise
 echo 1 > /sys/class/graphics/fb1/blank
 
-# Disable framebuffer scaling
-echo 0 > /sys/class/graphics/fb0/free_scale
-
-# set initial video state
-echo 1 > /sys/class/video/disable_video
-
 # Set default resolution parameters
-bpp=32;
 xRes=1280;
 yRes=720;
 
 # Get max supported display resolution by hdmi device
 maxRes=$(tail -n1 /sys/class/amhdmitx/amhdmitx0/disp_cap | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//');
-[ -z "$maxRes" ] && maxRes="$hdmimode";
+[ -z "$maxRes" ] && maxRes="$display_mode";
 
 case "$maxRes" in
   480*)
@@ -82,7 +78,7 @@ vXRes=$xRes;
 vYRes=$(( $yRes * 2 ));
 
 # Set boot resolution by hdmimode param
-case "$hdmimode" in
+case "$display_mode" in
   480*)
     if [ "$vXRes" -ge 720 -a "$vYRes" -ge 960 ]; then
       xRes=720; yRes=480;
@@ -111,7 +107,11 @@ case "$hdmimode" in
 esac
 
 # Set framebuffer geometry to match the resolution
-fbset -fb /dev/fb0 -g $xRes $yRes $vXRes $vYRes $bpp;
+fbset -fb /dev/fb0 -g $xRes $yRes $vXRes $vYRes 32;
+fbset -fb /dev/fb1 -g 32 32 32 32 32
+echo 0 > /sys/class/graphics/fb0/free_scale
+echo 0 > /sys/class/graphics/fb1/free_scale
+echo 1 > /sys/class/video/disable_video
 
 # Include deinterlacer into default VFM map
 echo rm default > /sys/class/vfm/map
