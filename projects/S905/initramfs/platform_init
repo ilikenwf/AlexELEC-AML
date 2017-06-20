@@ -4,11 +4,14 @@
 #      Copyright (C) 2011-2017 Alexandr Zuyev (alex@alexelec.in.ua)
 ################################################################################
 
-display_mode=$(cat /sys/class/display/mode)
+hdmimode="1080p50hz"
 
 # Parse command line arguments
 for arg in $(cat /proc/cmdline); do
   case ${arg} in
+    hdmimode=*)
+      hdmimode=${arg#*=}
+      ;;
     bootfrom*)
       bootfromext=1
       ;;
@@ -36,7 +39,7 @@ if [ -z "$BOOT_IMAGE" -o -z "$boot" -o -z "$disk" ]; then
 fi
 
 # Set framebuffer geometry to match the resolution
-case $display_mode in
+case $hdmimode in
   480*)            X=720  Y=480  ;;
   576*)            X=720  Y=576  ;;
   720p*)           X=1280 Y=720  ;;
@@ -50,7 +53,7 @@ echo 0 > /sys/class/graphics/fb1/free_scale
 echo 1 > /sys/class/video/disable_video
 
 # Enable scaling for 4K output
-case $display_mode in
+case $hdmimode in
   4k*|smpte*|2160*)
     echo 0 0 1919 1079 > /sys/class/graphics/fb0/free_scale_axis
     echo 0 0 3839 2159 > /sys/class/graphics/fb0/window_axis
