@@ -1,0 +1,10 @@
+[Unit]
+Description=Amlogic DVB module loader
+ConditionPathExists=/proc/device-tree/dvbfe/dtv_demod0
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/avl-dvb.run
+
+[Install]
+WantedBy=basic.target

@@ -1,0 +1,35 @@
+diff -Naurp linux-d560977/drivers/amlogic/amports/amstream.c linux-d560977-patch/drivers/amlogic/amports/amstream.c
+--- linux-d560977/drivers/amlogic/amports/amstream.c	2017-06-04 11:16:08.000000000 +0300
++++ linux-d560977-patch/drivers/amlogic/amports/amstream.c	2017-06-22 11:23:13.000000000 +0300
+@@ -3582,6 +3582,7 @@ struct stream_buf_s *get_stream_buffer(i
+ 		return 0;
+ 	return &bufs[id];
+ }
++EXPORT_SYMBOL_GPL(get_stream_buffer);
+ 
+ static const struct of_device_id amlogic_mesonstream_dt_match[] = {
+ 	{
+diff -Naurp linux-d560977/drivers/amlogic/amports/Makefile linux-d560977-patch/drivers/amlogic/amports/Makefile
+--- linux-d560977/drivers/amlogic/amports/Makefile	2017-06-04 11:16:08.000000000 +0300
++++ linux-d560977-patch/drivers/amlogic/amports/Makefile	2017-06-22 11:22:15.000000000 +0300
+@@ -124,8 +124,5 @@ obj-y += arch/
+ obj-y += cnm/
+ obj-y += decoder/
+ 
+-ifneq ($(CONFIG_AM_DVB),)
+ ##EXTRA_CFLAGS = -DENABLE_DEMUX_DRIVER -DMODIFY_TIMESTAMP_INC_WITH_PLL -DCALC_CACHED_TIME #-DUSE_VMASTER_MODE
+ ccflags-y = -DENABLE_DEMUX_DRIVER -DMODIFY_TIMESTAMP_INC_WITH_PLL -DCALC_CACHED_TIME #-DUSE_VMASTER_MODE
+-endif
+-
+diff -Naurp linux-d560977/drivers/amlogic/amports/tsdemux.c linux-d560977-patch/drivers/amlogic/amports/tsdemux.c
+--- linux-d560977/drivers/amlogic/amports/tsdemux.c	2017-06-04 11:16:08.000000000 +0300
++++ linux-d560977-patch/drivers/amlogic/amports/tsdemux.c	2017-06-22 11:24:10.000000000 +0300
+@@ -84,7 +84,7 @@ void tsdemux_set_ops(struct tsdemux_ops
+ 	demux_ops = ops;
+ 	spin_unlock_irqrestore(&demux_ops_lock, flags);
+ }
+-EXPORT_SYMBOL(tsdemux_set_ops);
++EXPORT_SYMBOL_GPL(tsdemux_set_ops);
+ 
+ int tsdemux_set_reset_flag_ext(void)
+ {

@@ -29,7 +29,7 @@
 
 #include "dvb_frontend.h"
 #include "avl6862.h"
-#include "avl6862_priv.h"
+#include "avl6882_priv.h"
 
 #define dbg_avl(fmt, args...) \
 	do {\
@@ -260,7 +260,7 @@ static int avl6862_setup_pll(struct avl6862_priv *priv)
 }
 
 
-#define DEMOD_WAIT_RETRIES	(10)
+#define DEMOD_WAIT_RETRIES	(100)
 #define DEMOD_WAIT_MS		(20)
 static int avl6862_wait_demod(struct avl6862_priv *priv)
 {
@@ -1516,7 +1516,7 @@ static int avl6862_set_frontend(struct dvb_frontend *fe)
 	ret = avl6862_RD_REG32(priv, 0x200 + rs_current_active_mode_iaddr_offset, &demod_mode);
 	if (ret)
 		return ret;
-
+/*
 	if (c->delivery_system == SYS_DVBC_ANNEX_A && c->symbol_rate < 6000000 ) {
 		c->delivery_system = SYS_DVBC_ANNEX_B;
 		c->bandwidth_hz = 6000000;
@@ -1618,15 +1618,11 @@ static int avl6862_set_property(struct dvb_frontend *fe,
 			break;
 		case SYS_DVBT:
 		case SYS_DVBT2:
+		default:
 			fe->ops.info.frequency_min = 174000000;
 			fe->ops.info.frequency_max = 862000000;
 			fe->ops.info.frequency_stepsize = 250000;
 			break;
-		default:
-			fe->ops.info.frequency_min = 0;
-			fe->ops.info.frequency_max = 0;
-			fe->ops.info.frequency_stepsize = 0;
-			ret = -EINVAL;
 		}
 
 		break;
@@ -1657,9 +1653,9 @@ static struct dvb_frontend_ops avl6862_ops = {
 	.delsys = {SYS_DVBT, SYS_DVBT2, SYS_DVBC_ANNEX_A, SYS_DVBC_ANNEX_B, SYS_DVBS, SYS_DVBS2},
 	.info = {
 		.name			= "Availink avl6862",
-		.frequency_min		= 0,
-		.frequency_max		= 0,
-		.frequency_stepsize	= 0,
+		.frequency_min		= 174000000,
+		.frequency_max		= 862000000,
+		.frequency_stepsize	= 62500,
 		.frequency_tolerance	= 0,
 		.symbol_rate_min	= 1000000,
 		.symbol_rate_max	= 45000000,
