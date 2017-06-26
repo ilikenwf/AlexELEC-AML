@@ -1,19 +1,6 @@
 ################################################################################
-#      This file is part of OpenELEC - http://www.openelec.tv
-#      Copyright (C) 2009-2016 Stephan Raue (stephan@openelec.tv)
-#
-#  OpenELEC is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
-#  the Free Software Foundation, either version 2 of the License, or
-#  (at your option) any later version.
-#
-#  OpenELEC is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#
-#  You should have received a copy of the GNU General Public License
-#  along with OpenELEC.  If not, see <http://www.gnu.org/licenses/>.
+#      This file is part of Alex@ELEC - http://www.alexelec.in.ua
+#      Copyright (C) 2011-2017 Alexandr Zuyev (alex@alexelec.in.ua)
 ################################################################################
 
 PKG_NAME="oem"
@@ -21,12 +8,60 @@ PKG_VERSION=""
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="various"
-PKG_SITE="http://www.libreelec.tv"
+PKG_SITE="http://alexelec.in.ua"
 PKG_URL=""
-PKG_DEPENDS_TARGET="toolchain $PROJECT"
+PKG_DEPENDS_TARGET="toolchain rng-tools u-boot-tools"
 PKG_SECTION="virtual"
 PKG_SHORTDESC="OEM: Metapackage for various OEM packages"
 PKG_LONGDESC="OEM: Metapackage for various OEM packages"
-
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
+
+post_install() {
+  if [ -n "$DEVICE" -a -d "$PROJECT_DIR/$PROJECT/devices/$DEVICE/filesystem" ]; then
+    cp -LR $PROJECT_DIR/$PROJECT/devices/$DEVICE/filesystem/* $ROOT/$BUILD/image/system
+  fi
+
+  if [ -n "$DEVICE" -a -e "$PROJECT_DIR/$PROJECT/devices/$DEVICE/install/files/logo.img" ]; then
+    mkdir -p $ROOT/$BUILD/image/system/usr/share/bootloader
+    cp -f $PROJECT_DIR/$PROJECT/devices/$DEVICE/install/files/logo.img $ROOT/$BUILD/image/system/usr/share/bootloader
+  elif [ -e "$PROJECT_DIR/$PROJECT/install/files/logo.img" ]; then
+    mkdir -p $ROOT/$BUILD/image/system/usr/share/bootloader
+    cp -f $PROJECT_DIR/$PROJECT/install/files/logo.img $ROOT/$BUILD/image/system/usr/share/bootloader
+  fi
+}
+
+# services net
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET acestream-aml"
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET aceproxy"
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET acephproxy"
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET transmission"
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET minidlna"
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET noxbit"
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET plexmediaserver"
+
+# tv services
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET vdr-all tvheadend"
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET wicard oscam"
+
+# tools
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET ImageMagick mc aml-vnc scan-s2 scan-m3u serviceref"
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET udpxy syncthing xupnpd boblightd"
+
+# games
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET emulationstation retroarch"
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET libretro-parallel-n64"
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET libretro-ppsspp"
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET libretro-pcsx_rearmed"
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET libretro-genesis-plus-gx"
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET libretro-snes9x2010"
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET libretro-mame2003"
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET libretro-fbalpha"
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET libretro-fuse"
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET libretro-nestopia"
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET libretro-picodrive"
+
+# dvb drivers
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET media_build"
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET media_build_cc"
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET s2-liplianin"

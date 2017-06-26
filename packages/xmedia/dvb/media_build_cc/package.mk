@@ -4,7 +4,7 @@
 ################################################################################
 
 PKG_NAME="media_build_cc"
-PKG_VERSION="20170508"
+PKG_VERSION="20170606"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
@@ -30,6 +30,26 @@ pre_make_target() {
 }
 
 make_target() {
+  # Amlogic AMLVIDEO driver
+  if [ -e "$(kernel_path)/drivers/amlogic/video_dev" ]; then
+    # Copy, patch and enable amlvideodri module
+    cp -a "$(kernel_path)/drivers/amlogic/video_dev" "linux/drivers/media/"
+    sed -i 's,common/,,g; s,"trace/,",g' $(find linux/drivers/media/video_dev/ -type f)
+    sed -i 's,\$(CONFIG_V4L_AMLOGIC_VIDEO),m,g' "linux/drivers/media/video_dev/Makefile"
+    echo "obj-y += video_dev/" >> "linux/drivers/media/Makefile"
+
+    # Copy and enable videobuf-res module
+    cp -a "$(kernel_path)/drivers/media/v4l2-core/videobuf-res.c" "linux/drivers/media/v4l2-core/"
+    cp -a "$(kernel_path)/include/media/videobuf-res.h" "linux/include/media/"
+    echo "obj-m += videobuf-res.o" >> "linux/drivers/media/v4l2-core/Makefile"
+  fi
+
+  # internal tuner driver avl6862
+  if [ -d $PROJECT_DIR/$PROJECT/dvb_tv ]; then
+    cp -a $PROJECT_DIR/$PROJECT/dvb_tv linux/drivers/media
+    echo "obj-y += dvb_tv/" >> linux/drivers/media/Makefile
+  fi
+
   make VER=$KERNEL_VER SRCDIR=$(kernel_path) stagingconfig
   make VER=$KERNEL_VER SRCDIR=$(kernel_path)
 }

@@ -4,8 +4,8 @@
 ################################################################################
 
 PKG_NAME="kodi-theme-Estuary"
-GIT_VERSION="147cec4"
-PKG_VERSION="17.3-$GIT_VERSION"
+GIT_VERSION="68cfb43"
+PKG_VERSION="17.4-rc1-$GIT_VERSION"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"

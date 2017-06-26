@@ -1,0 +1,10 @@
+#!/bin/sh
+################################################################################
+#      This file is part of Alex@ELEC - http://www.alexelec.in.ua
+#      Copyright (C) 2011-2017 Alexandr Zuyev (alex@alexelec.in.ua)
+################################################################################
+
+DVB_DRIVER=$(ls -l /storage/.modules/* | awk -F\/ '{print $7}' |  awk -F\- '{print $2}')
+DVB_PRESET=$(cat /proc/device-tree/dvbfe/dtv_demod0)
+
+[ "$DVB_PRESET" == "Avl6211" -a "$DVB_DRIVER" == "mbcc" ] && /sbin/modprobe aml_fe

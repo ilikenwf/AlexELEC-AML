@@ -1,8 +1,8 @@
 [Unit]
 Description=Kodi Media Center
-After=network-online.target graphical.target gui-switch.service
+After=kodi-waitonnetwork.service graphical.target gui-switch.service
 Requires=graphical.target gui-switch.service
-Wants=network-online.target
+Wants=kodi-waitonnetwork.service
 ConditionPathExists=/var/lock/start.kodi
 
 [Service]

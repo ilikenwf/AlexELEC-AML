@@ -4,12 +4,12 @@
 ################################################################################
 
 PKG_NAME="vdr-plugin-live"
-PKG_VERSION="869ac69"
+PKG_VERSION="8343f81"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://live.vdr-developer.org/en/index.php"
-PKG_URL="$ALEXELEC_SRC/$PKG_NAME-$PKG_VERSION.tar.xz"
+PKG_URL="https://github.com/jasmin-j/$PKG_NAME/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain vdr tntnet pcre:host pcre"
 PKG_SECTION="xmedia/tvservice"
 PKG_SHORTDESC="vdr-live: the LIVE Interactive VDR Environment/"
@@ -17,6 +17,11 @@ PKG_LONGDESC="vdr-live allows a comfortable operation of VDR and some of its plu
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 PKG_LOCALE_INSTALL="yes"
+
+pre_make_target() {
+  # dont build parallel
+  MAKEFLAGS=-j1
+}
 
 make_target() {
   : not

@@ -4,13 +4,13 @@
 ################################################################################
 
 PKG_NAME="tvheadend"
-PKG_VERSION="76dbc3e"
+PKG_VERSION="10c0eca"
 PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.tvheadend.org"
-PKG_URL=""
-PKG_DEPENDS_TARGET="toolchain curl libdvbcsa libiconv libressl pngquant:host Python:host yasm jq"
+PKG_URL="none"
+PKG_DEPENDS_TARGET="toolchain curl libdvbcsa libiconv openssl pngquant:host Python:host yasm jq"
 PKG_SECTION="xmedia/tvservice"
 PKG_SHORTDESC="Tvheadend: a TV streaming server for Linux supporting DVB-S, DVB-S2, DVB-C, DVB-T, ATSC, IPTV, and Analog video (V4L) as input sources."
 PKG_LONGDESC="Tvheadend is a TV streaming server for Linux supporting DVB-S, DVB-S2, DVB-C, DVB-T, ATSC, IPTV, and Analog video (V4L) as input sources. It also comes with a powerful and easy to use web interface both used for configuration and day-to-day operations, such as searching the EPG and scheduling recordings. Even so, the most notable feature of Tvheadend is how easy it is to set up: Install it, navigate to the web user interface, drill into the TV adapters tab, select your current location and Tvheadend will start scanning channels and present them to you in just a few minutes. If installing as an Addon a reboot is needed"
@@ -22,7 +22,7 @@ unpack() {
   git clone -b 'release/4.2' https://github.com/tvheadend/tvheadend.git $PKG_BUILD
   cd $PKG_BUILD
   git reset --hard $PKG_VERSION
-  PKG_VERSION_NUMBER=`git describe --match "v*"`
+  PKG_VERSION_NUMBER=`git describe --match "v*" | sed 's/-g.*$//'`
   echo "****** version: $PKG_VERSION_NUMBER ******"
   sed -e 's/VER="0.0.0~unknown"/VER="'$PKG_VERSION_NUMBER' ~ Alex@ELEC"/g' -i support/version
   sed -e 's|'/usr/bin/pngquant'|'$ROOT/$TOOLCHAIN/bin/pngquant'|g' -i support/mkbundle
