@@ -45,8 +45,8 @@ make_target() {
   fi
 
   # internal tuner driver avl6862
-  if [ -d $PROJECT_DIR/$PROJECT/devices/$DEVICE/dvb_tv ]; then
-    cp -a $PROJECT_DIR/$PROJECT/devices/$DEVICE/dvb_tv linux/drivers/media
+  if [ -d $PROJECT_DIR/$PROJECT/dvb_tv ]; then
+    cp -a $PROJECT_DIR/$PROJECT/dvb_tv linux/drivers/media
     echo "obj-y += dvb_tv/" >> linux/drivers/media/Makefile
   fi
 
