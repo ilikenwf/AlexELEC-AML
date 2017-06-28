@@ -32,7 +32,7 @@ install_to_nand() {
     mount -o rw,remount /flash
 
     echo -n "Writing kernel image..."
-    dd if="$IMAGE_KERNEL" of="/dev/boot" bs=64K status=none && sync
+    dd if="$IMAGE_KERNEL" of=/dev/boot bs=64k status=none
     echo "done."
 
     echo -n "Formatting SYSTEM partition..."
