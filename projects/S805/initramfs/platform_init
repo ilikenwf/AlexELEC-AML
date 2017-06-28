@@ -76,3 +76,5 @@ done
 #    CPU 3    1000         8
 echo 2 > /proc/irq/40/smp_affinity  # eth0
 echo 4 > /proc/irq/62/smp_affinity  # dwc_otg, dwc_otg_hcd:usb2
+
+echo 1 > /sys/devices/system/cpu/cpufreq/ondemand/io_is_busy
