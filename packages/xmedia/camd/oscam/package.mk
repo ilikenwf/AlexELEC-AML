@@ -4,8 +4,8 @@
 ################################################################################
 
 PKG_NAME="oscam"
-PKG_VERSION="38b0acf"
-PKG_VERSION_NUMBER="11384"
+PKG_VERSION="d668e52"
+PKG_VERSION_NUMBER="11388"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
