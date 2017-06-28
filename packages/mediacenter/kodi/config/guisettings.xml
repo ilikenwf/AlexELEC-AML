@@ -45,9 +45,6 @@
         <trafficadvisory default="true">false</trafficadvisory>
         <trafficadvisoryvolume default="true">10</trafficadvisoryvolume>
     </pvrplayback>
-    <videoplayer>
-        <autoplaynextitem>false</autoplaynextitem>
-    </videoplayer>
     <weather>
         <addon>weather.openweathermap.extended</addon>
         <currentlocation default="true">1</currentlocation>
