@@ -1,24 +1,6 @@
 diff -Naurp kodi-17.0-beta6-37e4739/system/settings/settings.xml kodi-17.0-beta6-37e4739-patch/system/settings/settings.xml
 --- kodi-17.0-beta6-37e4739/system/settings/settings.xml	2016-11-10 15:40:39.000000000 +0200
 +++ kodi-17.0-beta6-37e4739-patch/system/settings/settings.xml	2016-11-10 16:51:00.000000000 +0200
-@@ -5,7 +5,7 @@
-       <group id="1" label="14230">
-         <setting id="videoplayer.autoplaynextitem" type="boolean" label="13433" help="36152">
-           <level>0</level>
--          <default>false</default>
-+          <default>true</default>
-           <control type="toggle" />
-         </setting>
-         <setting id="videoplayer.seeksteps" type="list[integer]" label="13556" help="37042">
-@@ -36,7 +36,7 @@
-       <group id="2" label="19177">
-         <setting id="videoplayer.adjustrefreshrate" type="integer" label="170" help="36164">
-           <level>1</level>
--          <default>2</default> <!-- ADJUST_REFRESHRATE_ON_STARTSTOP -->
-+          <default>0</default> <!-- ADJUST_REFRESHRATE_ON_STARTSTOP -->
-           <constraints>
-             <options>
-               <option label="351">0</option> <!-- ADJUST_REFRESHRATE_OFF -->
 @@ -65,7 +65,7 @@
          </setting>
          <setting id="videoplayer.stretch43" type="integer" label="173" help="36171">
