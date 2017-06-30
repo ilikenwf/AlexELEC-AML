@@ -3,6 +3,7 @@
 
 [reader]
 label                         = HTB
+enable                        = 0
 protocol                      = newcamd
 device                        = host,port
 key                           = 0102030405060708091011121314
@@ -16,7 +17,21 @@ group                         = 1
 audisabled                    = 1
 
 [reader]
+label                         = BISS
+enable                        = 1
+protocol                      = emu
+device                        = emulator
+caid                          = 2600
+detect                        = cd
+group                         = 2
+audisabled                    = 1
+
+
+## sample EMU ##
+
+[reader]
 label                         = emulator
+enable                        = 0
 protocol                      = emu
 device                        = emulator
 caid                          = 090F,0500,1801,0604,2600,FFFF,0E00,4AE1,1010
@@ -25,3 +40,12 @@ ident                         = 090F:000000;0500:000000,023800,021110,007400,007
 group                         = 2
 emmcache                      = 2,1,2,1
 emu_auproviders               = 0604:010200;0E00:000000;4AE1:000011,000014,0000FE;1010:000000
+
+[reader]
+label                         = constcw
+enable                        = 0
+protocol                      = constcw
+device                        = /storage/.config/oscam/config/constant.cw
+caid                          = 2600
+group                         = 2
+audisabled                    = 1
