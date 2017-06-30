@@ -16,8 +16,8 @@ index 3ebd781..2966e65 100644
  
  set (exe_name "oscam")
  add_executable (${exe_name} ${exe_srcs} ${exe_hdrs})
--target_link_libraries (${exe_name} ${csoscam} ${csmodules} ${csreaders} csctapi cscrypt minilzo)
-+target_link_libraries (${exe_name} ${csoscam} ${csmodules} ${csreaders} csctapi cscrypt minilzo udev)
+-target_link_libraries (${exe_name} ${csoscam} ${csmodules} ${csreaders} csctapi cscrypt minilzo ffdecsa)
++target_link_libraries (${exe_name} ${csoscam} ${csmodules} ${csreaders} csctapi cscrypt minilzo ffdecsa udev)
  if(HAVE_LIBRT AND HAVE_LIBUSB)
     if (LIBUSBDIR)
  	set (libusb_link "imp_libusb")

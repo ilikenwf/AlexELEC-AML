@@ -28,6 +28,7 @@ PKG_CMAKE_OPTS_TARGET="-DLIBUSBDIR=$SYSROOT_PREFIX/usr \
                        -DHAVE_LIBCRYPTO=0 \
                        -DHAVE_DVBAPI=1 -DWITH_STAPI=0 \
                        -DWEBIF=1 \
+                       -DWITH_EMU=1 \
                        -DWITH_DEBUG=0 \
                        -DOPTIONAL_INCLUDE_DIR=$SYSROOT_PREFIX/usr/include \
                        -DSTATIC_LIBUSB=1 \
