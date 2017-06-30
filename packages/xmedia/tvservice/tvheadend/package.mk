@@ -4,8 +4,8 @@
 ################################################################################
 
 PKG_NAME="tvheadend"
-PKG_VERSION="c495097"
-PKG_REV="2"
+PKG_VERSION="daa5a1e"
+PKG_REV="3"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.tvheadend.org"
@@ -19,7 +19,7 @@ PKG_AUTORECONF="no"
 PKG_LOCALE_INSTALL="yes"
 
 unpack() {
-  git clone -b 'release/4.2' https://github.com/tvheadend/tvheadend.git $PKG_BUILD
+  git clone -b 'master' https://github.com/tvheadend/tvheadend.git $PKG_BUILD
   cd $PKG_BUILD
   git reset --hard $PKG_VERSION
   PKG_VERSION_NUMBER=`git describe --match "v*" | sed 's/-g.*$//'`
