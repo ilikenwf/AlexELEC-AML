@@ -17,14 +17,15 @@ group                         = 1
 audisabled                    = 1
 
 [reader]
-label                         = BISS
+label                         = EMU-soft
 enable                        = 1
 protocol                      = emu
 device                        = emulator
-caid                          = 2600
+caid                          = 2600,0E00
 detect                        = cd
 group                         = 2
-audisabled                    = 1
+emmcache                      = 1,1,31,0
+emu_auproviders               = 0E00:000000
 
 
 ## sample EMU ##
