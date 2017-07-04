@@ -1,7 +1,7 @@
-diff -Naurp vdr-2.0.1/epg.c vdr-2.0.1-patch/epg.c
---- vdr-2.0.1/epg.c	2013-04-17 07:15:23.000000000 +0300
-+++ vdr-2.0.1-patch/epg.c	2013-04-17 05:09:56.000000000 +0300
-@@ -928,7 +928,7 @@ const cEvent *cSchedule::GetPresentEvent
+diff -Naurp vdr-2.3.8/epg.c vdr-2.3.8-patch/epg.c
+--- vdr-2.3.8/epg.c	2017-05-28 16:08:09.000000000 +0300
++++ vdr-2.3.8-patch/epg.c	2017-07-04 19:56:12.000000000 +0300
+@@ -969,7 +969,7 @@ const cEvent *cSchedule::GetPresentEvent
           pe = p;
        else if (p->StartTime() > now + 3600)
           break;

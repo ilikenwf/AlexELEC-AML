@@ -1,6 +1,6 @@
-diff -Naurp vdr-2.3.7/eitscan.c vdr-2.3.7-patch/eitscan.c
---- vdr-2.3.7/eitscan.c	2017-06-16 19:04:13.000000000 +0300
-+++ vdr-2.3.7-patch/eitscan.c	2017-06-16 19:13:13.000000000 +0300
+diff -Naurp vdr-2.3.8/eitscan.c vdr-2.3.8-patch/eitscan.c
+--- vdr-2.3.8/eitscan.c	2017-07-04 20:56:17.000000000 +0300
++++ vdr-2.3.8-patch/eitscan.c	2017-07-04 20:59:39.000000000 +0300
 @@ -148,7 +148,7 @@ void cEITScanner::Process(void)
                       && (!Device->PoweredDown() || lastActivity == 0)) { // powered up or forced scan
                    for (cScanData *ScanData = scanList->First(); ScanData; ScanData = scanList->Next(ScanData)) {
@@ -10,16 +10,15 @@ diff -Naurp vdr-2.3.7/eitscan.c vdr-2.3.7-patch/eitscan.c
                           if (!Channel->Ca() || Channel->Ca() == Device->DeviceNumber() + 1 || Channel->Ca() >= CA_ENCRYPTED_MIN) {
                              if (Device->ProvidesTransponder(Channel)) {
                                 if (Device->Priority() < 0) {
-diff -Naurp vdr-2.3.7/pat.c vdr-2.3.7-patch/pat.c
---- vdr-2.3.7/pat.c	2017-06-16 19:04:13.000000000 +0300
-+++ vdr-2.3.7-patch/pat.c	2017-06-16 19:18:06.000000000 +0300
-@@ -643,7 +643,8 @@ void cPatFilter::Process(u_short Pid, u_
+diff -Naurp vdr-2.3.8/pat.c vdr-2.3.8-patch/pat.c
+--- vdr-2.3.8/pat.c	2016-12-23 16:02:07.000000000 +0200
++++ vdr-2.3.8-patch/pat.c	2017-07-04 21:05:22.000000000 +0300
+@@ -623,7 +623,7 @@ void cPatFilter::Process(u_short Pid, u_
+                    }
+                }
              }
-         if (Setup.UpdateChannels >= 2) {
+-        if (Setup.UpdateChannels >= 2) {
++        if (Setup.UpdateChannels >= 2 && !cSource::IsType(Channel->Source(), 'I')) {
             ChannelsModified |= Channel->SetPids(Vpid, Ppid, Vtype, Apids, Atypes, ALangs, Dpids, Dtypes, DLangs, Spids, SLangs, Tpid);
--           ChannelsModified |= Channel->SetCaIds(CaDescriptors->CaIds());
-+           if (!cSource::IsType(Channel->Source(), 'I'))
-+              ChannelsModified |= Channel->SetCaIds(CaDescriptors->CaIds());
+            ChannelsModified |= Channel->SetCaIds(CaDescriptors->CaIds());
             ChannelsModified |= Channel->SetSubtitlingDescriptors(SubtitlingTypes, CompositionPageIds, AncillaryPageIds);
-            }
-         ChannelsModified |= Channel->Set3DMode(Vis3dMode);

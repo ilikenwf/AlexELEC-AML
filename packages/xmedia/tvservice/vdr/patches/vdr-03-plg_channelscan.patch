@@ -1,32 +1,35 @@
-diff -Naurp vdr-2.3.7/device.c vdr-2.3.7-patch/device.c
---- vdr-2.3.7/device.c	2017-06-16 19:04:13.000000000 +0300
-+++ vdr-2.3.7-patch/device.c	2017-06-16 19:07:46.000000000 +0300
-@@ -20,6 +20,9 @@
+diff -Naurp vdr-2.3.8/device.c vdr-2.3.8-patch/device.c
+--- vdr-2.3.8/device.c	2017-05-30 14:06:11.000000000 +0300
++++ vdr-2.3.8-patch/device.c	2017-07-04 20:01:20.000000000 +0300
+@@ -20,6 +20,10 @@
  #include "status.h"
  #include "transfer.h"
  
-+// channelscan
++// --- channelscan -----------------------------------------------------------
++
 +bool scanning_on_receiving_device = false;
 +
  // --- cLiveSubtitle ---------------------------------------------------------
  
  class cLiveSubtitle : public cReceiver {
-diff -Naurp vdr-2.3.7/device.h vdr-2.3.7-patch/device.h
---- vdr-2.3.7/device.h	2017-06-16 19:04:13.000000000 +0300
-+++ vdr-2.3.7-patch/device.h	2017-06-16 19:08:15.000000000 +0300
-@@ -33,6 +33,8 @@
- #define VOLUMEDELTA       (MAXVOLUME / Setup.VolumeSteps) // used to increase/decrease the volume
- #define MAXOCCUPIEDTIMEOUT 99 // max. time (in seconds) a device may be occupied
+diff -Naurp vdr-2.3.8/device.h vdr-2.3.8-patch/device.h
+--- vdr-2.3.8/device.h	2017-07-04 19:53:56.000000000 +0300
++++ vdr-2.3.8-patch/device.h	2017-07-04 20:01:17.000000000 +0300
+@@ -35,6 +35,10 @@
  
-+extern bool scanning_on_receiving_device;
-+
  enum eSetChannelResult { scrOk, scrNotAvailable, scrNoTransfer, scrFailed };
  
++// --- channelscan -----------------------------------------------------------
++
++extern bool scanning_on_receiving_device;
++
  // Note that VDR itself always uses pmAudioVideo when replaying a recording!
-diff -Naurp vdr-2.3.7/vdr.c vdr-2.3.7-patch/vdr.c
---- vdr-2.3.7/vdr.c	2017-06-16 19:04:13.000000000 +0300
-+++ vdr-2.3.7-patch/vdr.c	2017-06-16 19:07:08.000000000 +0300
-@@ -964,7 +964,7 @@ int main(int argc, char *argv[])
+ enum ePlayMode { pmNone,           // audio/video from decoder
+                  pmAudioVideo,     // audio/video from player
+diff -Naurp vdr-2.3.8/vdr.c vdr-2.3.8-patch/vdr.c
+--- vdr-2.3.8/vdr.c	2017-07-04 19:53:56.000000000 +0300
++++ vdr-2.3.8-patch/vdr.c	2017-07-04 20:02:24.000000000 +0300
+@@ -963,7 +963,7 @@ int main(int argc, char *argv[])
          if (!EITScanner.Active() && cDevice::PrimaryDevice()->HasDecoder()) {
             static time_t lastTime = 0;
             if (!cDevice::PrimaryDevice()->HasProgramme()) {

@@ -5,7 +5,7 @@
  
  #ifndef EXTSHELL
 -#define EXTSHELL "/bin/bash"
-+#define EXTSHELL "/bin/busybox"
++#define EXTSHELL "/bin/sh"
  #endif
  
  cIptvProtocolExt::cIptvProtocolExt()
