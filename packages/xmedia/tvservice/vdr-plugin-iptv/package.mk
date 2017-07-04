@@ -20,8 +20,7 @@ PKG_LOCALE_INSTALL="yes"
 
 make_target() {
   VDR_DIR=$(get_build_dir vdr)
-  make VDRDIR=$VDR_DIR \
-       DVBCHANPATCH=1
+  make VDRDIR=$VDR_DIR
 }
 
 post_makeinstall_target() {
