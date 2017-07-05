@@ -3,19 +3,13 @@ Description=ZRAM service
 
 [Service]
 Type=simple
-ExecStart=/bin/sh -c "modprobe zram num_devices=4 ; \
-echo 256M > /sys/block/zram0/disksize ; \
-echo 256M > /sys/block/zram1/disksize ; \
-echo 256M > /sys/block/zram2/disksize ; \
-echo 256M > /sys/block/zram3/disksize ; \
+ExecStart=/bin/sh -c "modprobe zram num_devices=2 ; \
+echo 128M > /sys/block/zram0/disksize ; \
+echo 128M > /sys/block/zram1/disksize ; \
 /sbin/mkswap /dev/zram0 ; \
 /sbin/mkswap /dev/zram1 ; \
-/sbin/mkswap /dev/zram2 ; \
-/sbin/mkswap /dev/zram3 ; \
 /usr/sbin/swapon -p 10 /dev/zram0 ; \
-/usr/sbin/swapon -p 10 /dev/zram1 ; \
-/usr/sbin/swapon -p 10 /dev/zram2 ; \
-/usr/sbin/swapon -p 10 /dev/zram3 "
+/usr/sbin/swapon -p 10 /dev/zram1 "
 
 [Install]
 WantedBy=swap.service
