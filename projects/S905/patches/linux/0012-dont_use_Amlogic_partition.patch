@@ -1,0 +1,24 @@
+From a35bd0b0da8c36ebb11c82850b83ab1cbb6c8844 Mon Sep 17 00:00:00 2001
+From: kszaq <kszaquitto@gmail.com>
+Date: Sat, 1 Jul 2017 10:47:28 +0200
+Subject: [PATCH] drivers/amlogic/mmc: don't use Amlogic partition layout if
+ there is no device tree node
+
+---
+ drivers/amlogic/mmc/emmc_partitions.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/amlogic/mmc/emmc_partitions.c b/drivers/amlogic/mmc/emmc_partitions.c
+index 1925423870e..65df19b513a 100644
+--- a/drivers/amlogic/mmc/emmc_partitions.c
++++ b/drivers/amlogic/mmc/emmc_partitions.c
+@@ -672,6 +672,9 @@ int aml_emmc_partition_ops(struct mmc_card *card, struct gendisk *disk)
+ 	if (!is_card_emmc(card)) /* not emmc, nothing to do */
+ 		return 0;
+ 
++	if (!of_find_node_by_path("/partitions"))
++		return 0;
++
+ 	store_device = host->storage_flag;
+ 	pt_fmt = kmalloc(sizeof(struct mmc_partitions_fmt), GFP_KERNEL);
+ 	if (pt_fmt == NULL) {
