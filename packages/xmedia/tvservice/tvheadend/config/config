@@ -1,5 +1,5 @@
 {
-	"wizard": false,
+	"wizard": "hello",
 	"uilevel": 1,
 	"uilevel_nochange": true,
 	"ui_quicktips": true,
