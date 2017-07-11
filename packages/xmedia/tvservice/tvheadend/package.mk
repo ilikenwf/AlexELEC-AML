@@ -87,6 +87,9 @@ post_makeinstall_target() {
     cp -a data/dvb-scan/dvb-t $INSTALL/usr/config/tvheadend/dvb-scan
     cp -a data/dvb-scan/isdb-t $INSTALL/usr/config/tvheadend/dvb-scan
   #config
+    rm -f $INSTALL/usr/config/tvheadend/dvb-scan/dvb-t/ua-Kyiv
+    rm -f $INSTALL/usr/config/tvheadend/dvb-scan/dvb-s/Amos-*
+    rm -f $INSTALL/usr/config/tvheadend/dvb-scan/dvb-s/Sirius-*
     cp -a $PKG_DIR/config/* $INSTALL/usr/config/tvheadend
 }
 
