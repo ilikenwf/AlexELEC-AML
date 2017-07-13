@@ -38,7 +38,7 @@
 #define TS_IN_COUNT       3
 #define S2P_COUNT         2
 
-#define DMX_DEV_COUNT     3
+#define DMX_DEV_COUNT     1
 #define FE_DEV_COUNT      2
 #define CHANNEL_COUNT     31
 #define FILTER_COUNT      31
