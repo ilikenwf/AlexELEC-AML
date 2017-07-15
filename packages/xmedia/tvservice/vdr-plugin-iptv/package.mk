@@ -4,7 +4,7 @@
 ################################################################################
 
 PKG_NAME="vdr-plugin-iptv"
-PKG_VERSION="08cecd5"
+PKG_VERSION="0fe1cb7"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
@@ -20,8 +20,7 @@ PKG_LOCALE_INSTALL="yes"
 
 make_target() {
   VDR_DIR=$(get_build_dir vdr)
-  make VDRDIR=$VDR_DIR \
-       DVBCHANPATCH=1
+  make VDRDIR=$VDR_DIR
 }
 
 post_makeinstall_target() {

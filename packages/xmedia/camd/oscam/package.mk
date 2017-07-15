@@ -4,14 +4,14 @@
 ################################################################################
 
 PKG_NAME="oscam"
-PKG_VERSION="d668e52"
-PKG_VERSION_NUMBER="11388"
+PKG_VERSION="b29f5c6"
+PKG_VERSION_NUMBER="11390"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.streamboard.tv/oscam/wiki"
 PKG_URL="http://repo.or.cz/oscam.git/snapshot/$PKG_VERSION.tar.gz"
-PKG_DEPENDS_TARGET="toolchain pcsc-lite"
+PKG_DEPENDS_TARGET="toolchain pcsc-lite openssl"
 PKG_SECTION="xmedia/camd"
 PKG_SHORTDESC="oscam: OSCam is Open Source Conditional Access Modul."
 PKG_LONGDESC="OSCam is Open Source Conditional Access Modul."
@@ -20,13 +20,16 @@ PKG_AUTORECONF="no"
 
 pre_configure_target() {
   export OSCAM_VERSION_NUMBER="$PKG_VERSION_NUMBER"
+  cp -f $PKG_DIR/config/SoftCam.Key $ROOT/$PKG_BUILD
 }
 
 PKG_CMAKE_OPTS_TARGET="-DLIBUSBDIR=$SYSROOT_PREFIX/usr \
                        -DCMAKE_INSTALL_PREFIX=/usr \
-                       -DWITH_SSL=0 \
-                       -DHAVE_LIBCRYPTO=0 \
-                       -DHAVE_DVBAPI=1 -DWITH_STAPI=0 \
+                       -DWITH_SSL=1 \
+                       -DHAVE_LIBCRYPTO=1 \
+                       -DHAVE_PCSC=1 \
+                       -DHAVE_DVBAPI=1 \
+                       -DWITH_STAPI=0 \
                        -DWEBIF=1 \
                        -DWITH_EMU=1 \
                        -DWITH_DEBUG=0 \
@@ -37,6 +40,7 @@ PKG_CMAKE_OPTS_TARGET="-DLIBUSBDIR=$SYSROOT_PREFIX/usr \
 makeinstall_target() {
   mkdir -p  $INSTALL/usr/config/oscam
     cp -a $PKG_DIR/config $INSTALL/usr/config/oscam
+    rm -f $INSTALL/usr/config/oscam/config/SoftCam.Key
 
   mkdir -p  $INSTALL/usr/bin
     cp $ROOT/$PKG_BUILD/.$TARGET_NAME/oscam $INSTALL/usr/bin
