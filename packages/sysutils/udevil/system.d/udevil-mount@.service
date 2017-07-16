@@ -1,5 +1,6 @@
 [Unit]
 Description=Udevil mount service
+Before=transmission.service minidlna.service xupnpd.service udpxy.service plex.service
 
 [Service]
 Type=oneshot
