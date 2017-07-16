@@ -4,7 +4,7 @@
 ################################################################################
 
 PKG_NAME="vdr-plugin-osd2web"
-PKG_VERSION="968110a"
+PKG_VERSION="b9e0a00"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
@@ -20,7 +20,7 @@ PKG_LOCALE_INSTALL="yes"
 
 make_target() {
   VDR_DIR=$(get_build_dir vdr)
-  make VDRDIR=$VDR_DIR CXX=$CXX
+  make VDRDIR=$VDR_DIR CXX=$CXX GIT_REV=$PKG_VERSION
 }
 
 post_makeinstall_target() {
