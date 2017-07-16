@@ -4,7 +4,7 @@
 ################################################################################
 
 PKG_NAME="vdr-plugin-epgsearch"
-PKG_VERSION="ceb158e"
+PKG_VERSION="65aabbf"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
