@@ -1,19 +1,7 @@
-From c2ca764205febf3f4642ba1b6d930ac93098ec81 Mon Sep 17 00:00:00 2001
-From: kszaq <kszaquitto@gmail.com>
-Date: Sat, 8 Apr 2017 01:54:37 +0200
-Subject: [PATCH] EGLNativeTypeAmlogic: implement Nougat-kernel style
- fractional frame rates
-
----
- xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp | 41 ++++++++++++++++++++++-------
- xbmc/windowing/egl/EGLNativeTypeAmlogic.h   |  2 +-
- 2 files changed, 32 insertions(+), 11 deletions(-)
-
-diff --git a/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp b/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
-index 3cbb604..6921be4 100644
---- a/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
-+++ b/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
-@@ -29,6 +29,7 @@
+diff -Naurp kodi-17.4-rc1-b22184d/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp kodi-17.4-rc1-b22184d-patch/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
+--- kodi-17.4-rc1-b22184d/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp	2017-07-18 10:14:07.000000000 +0300
++++ kodi-17.4-rc1-b22184d-patch/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp	2017-07-18 10:21:19.000000000 +0300
+@@ -31,6 +31,7 @@
  #include <linux/fb.h>
  #include <sys/ioctl.h>
  #include <EGL/egl.h>
@@ -21,7 +9,7 @@ index 3cbb604..6921be4 100644
  
  CEGLNativeTypeAmlogic::CEGLNativeTypeAmlogic()
  {
-@@ -128,7 +129,15 @@ bool CEGLNativeTypeAmlogic::GetNativeResolution(RESOLUTION_INFO *res) const
+@@ -130,7 +131,15 @@ bool CEGLNativeTypeAmlogic::GetNativeRes
  {
    std::string mode;
    SysfsUtils::GetString("/sys/class/display/mode", mode);
@@ -38,12 +26,13 @@ index 3cbb604..6921be4 100644
  }
  
  bool CEGLNativeTypeAmlogic::SetNativeResolution(const RESOLUTION_INFO &res)
-@@ -143,10 +152,11 @@ bool CEGLNativeTypeAmlogic::SetNativeResolution(const RESOLUTION_INFO &res)
+@@ -145,11 +154,11 @@ bool CEGLNativeTypeAmlogic::SetNativeRes
  #endif
  
    // Don't set the same mode as current
 -  std::string mode;
 -  SysfsUtils::GetString("/sys/class/display/mode", mode);
+-  
 -  if (res.strId != mode)
 -    result = SetDisplayResolution(res.strId.c_str());
 +  RESOLUTION_INFO current_resolution;
@@ -54,7 +43,7 @@ index 3cbb604..6921be4 100644
  
    DealWithScale(res);
  
-@@ -166,6 +171,18 @@ bool CEGLNativeTypeAmlogic::ProbeResolutions(std::vector<RESOLUTION_INFO> &resol
+@@ -192,6 +201,18 @@ bool CEGLNativeTypeAmlogic::ProbeResolut
    {
      if(aml_mode_to_resolution(i->c_str(), &res))
        resolutions.push_back(res);
@@ -73,7 +62,7 @@ index 3cbb604..6921be4 100644
    }
    return resolutions.size() > 0;
  
-@@ -190,14 +207,22 @@ bool CEGLNativeTypeAmlogic::ShowWindow(bool show)
+@@ -216,14 +237,22 @@ bool CEGLNativeTypeAmlogic::ShowWindow(b
    return true;
  }
  
@@ -100,10 +89,9 @@ index 3cbb604..6921be4 100644
    SetFramebufferResolution(res);
  
    return true;
-diff --git a/xbmc/windowing/egl/EGLNativeTypeAmlogic.h b/xbmc/windowing/egl/EGLNativeTypeAmlogic.h
-index 96aa6f7..b7c053b 100644
---- a/xbmc/windowing/egl/EGLNativeTypeAmlogic.h
-+++ b/xbmc/windowing/egl/EGLNativeTypeAmlogic.h
+diff -Naurp kodi-17.4-rc1-b22184d/xbmc/windowing/egl/EGLNativeTypeAmlogic.h kodi-17.4-rc1-b22184d-patch/xbmc/windowing/egl/EGLNativeTypeAmlogic.h
+--- kodi-17.4-rc1-b22184d/xbmc/windowing/egl/EGLNativeTypeAmlogic.h	2017-07-18 10:14:07.000000000 +0300
++++ kodi-17.4-rc1-b22184d-patch/xbmc/windowing/egl/EGLNativeTypeAmlogic.h	2017-07-18 10:21:52.000000000 +0300
 @@ -51,7 +51,7 @@ public:
    virtual bool  ShowWindow(bool show);
  
@@ -113,6 +101,3 @@ index 96aa6f7..b7c053b 100644
    void SetupVideoScaling(const char *mode);
    void DealWithScale(const RESOLUTION_INFO &res);
    void EnableFreeScale(const RESOLUTION_INFO &res);
--- 
-1.8.3.1
-
