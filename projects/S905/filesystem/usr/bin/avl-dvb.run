@@ -5,10 +5,9 @@
 ################################################################################
 
 AVL_ARG="$1"
-DVB_DRIVER=$(ls -l /storage/.modules/* | awk -F\/ '{print $7}' |  awk -F\- '{print $2}')
 DVB_PRESET=$(cat /proc/device-tree/dvbfe/dtv_demod0)
 
-if [ "$DVB_PRESET" == "Avl6211" -a "$DVB_DRIVER" == "mbcc" ]; then
+if [ "$DVB_PRESET" == "Avl6211" ]; then
   if [ "$AVL_ARG" == "del" ]; then
       /sbin/rmmod aml_fe
   else
