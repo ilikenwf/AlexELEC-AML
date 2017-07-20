@@ -4,18 +4,17 @@
 #      Copyright (C) 2011-2017 Alexandr Zuyev (alex@alexelec.in.ua)
 ################################################################################
 
-SERVICE="tvheadend.service"
-SERVICE_DIR="/storage/.cache/services"
+AVL_MODULE_RUN="/usr/bin/avl-dvb.run"
 
 case $1 in
   pre)
-    if [ -f "$SERVICE_DIR/tvheadend.conf" ] ; then
-      systemctl stop "$SERVICE"
+    if [ -x "$AVL_MODULE_RUN" ] ; then
+      $AVL_MODULE_RUN del
     fi
     ;;
   post)
-    if [ -f "$SERVICE_DIR/tvheadend.conf" ] ; then
-      systemctl start "$SERVICE"
+    if [ -x "$AVL_MODULE_RUN" ] ; then
+      $AVL_MODULE_RUN
     fi
     ;;
 esac
