@@ -62,6 +62,6 @@ post_install() {
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET libretro-picodrive"
 
 # dvb drivers
-  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET media_build"
+  #PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET media_build"
+  #PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET s2-liplianin"
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET media_build_cc"
-  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET s2-liplianin"
