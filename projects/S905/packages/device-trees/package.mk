@@ -10,7 +10,7 @@ PKG_LICENSE="OSS"
 PKG_DEPENDS_TARGET="toolchain linux"
 PKG_AUTORECONF="no"
 
-EXTRA_TREES=(gxbb_p201.dtb gxl_p212_1g.dtb gxl_p212_2g.dtb)
+EXTRA_TREES=(gxbb_p201.dtb gxl_p212_1g.dtb gxl_p212_2g.dtb gxbb_p200_2G_wetek_play_2.dtb)
 
 if [ "$TARGET_KERNEL_ARCH" = "arm64" -a "$TARGET_ARCH" = "arm" ]; then
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET gcc-linaro-aarch64-linux-gnu:host"
