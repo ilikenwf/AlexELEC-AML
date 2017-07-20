@@ -44,10 +44,13 @@ make_target() {
     echo "obj-m += videobuf-res.o" >> "linux/drivers/media/v4l2-core/Makefile"
   fi
 
-  # internal tuner driver avl6862
-  if [ -d $PROJECT_DIR/$PROJECT/dvb_tv ]; then
-    cp -a $PROJECT_DIR/$PROJECT/dvb_tv linux/drivers/media
-    echo "obj-y += dvb_tv/" >> linux/drivers/media/Makefile
+  # Amlogic DVB driver avl6862 & wetekdvb
+  if [ "$PROJECT" = "S905" ]; then
+    if [ -d $PROJECT_DIR/$PROJECT/dvb_tv ]; then
+      cp -a $PROJECT_DIR/$PROJECT/dvb_tv linux/drivers/media
+      echo "obj-y += dvb_tv/" >> linux/drivers/media/Makefile
+    fi
+    echo "obj-y += amlogic/dvb_tv/" >> "linux/drivers/media/Makefile"
   fi
 
   make VER=$KERNEL_VER SRCDIR=$(kernel_path) stagingconfig

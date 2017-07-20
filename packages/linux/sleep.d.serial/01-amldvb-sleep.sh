@@ -5,16 +5,15 @@
 ################################################################################
 
 AVL_MODULE_RUN="/usr/bin/avl-dvb.run"
+WETEK_MODULE_RUN="/usr/bin/wetek-dvb.run"
 
 case $1 in
   pre)
-    if [ -x "$AVL_MODULE_RUN" ] ; then
-      $AVL_MODULE_RUN del
-    fi
+    [ -x "$AVL_MODULE_RUN" ] && $AVL_MODULE_RUN del
+    [ -x "$WETEK_MODULE_RUN" ] && $WETEK_MODULE_RUN del
     ;;
   post)
-    if [ -x "$AVL_MODULE_RUN" ] ; then
-      $AVL_MODULE_RUN
-    fi
+    [ -x "$AVL_MODULE_RUN" ] && $AVL_MODULE_RUN
+    [ -x "$WETEK_MODULE_RUN" ] && $WETEK_MODULE_RUN
     ;;
 esac
