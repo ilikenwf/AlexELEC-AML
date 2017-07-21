@@ -4,8 +4,8 @@
 ################################################################################
 
 PKG_NAME="ffmpeg"
-# Current branch is: release/3.3-kodi
-PKG_VERSION="eb0819c"
+# Current branch is: release/3.3-kodi | VERSION: 3.3.2
+PKG_VERSION="30554d7"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="LGPLv2.1+"

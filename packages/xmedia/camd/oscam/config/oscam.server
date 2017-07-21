@@ -30,6 +30,17 @@ audisabled                    = 1
 ## sample EMU ##
 
 [reader]
+label                         = BISS-PowerVu
+enable                        = 0
+protocol                      = emu
+device                        = emulator
+caid                          = 2600,0E00
+detect                        = cd
+group                         = 2
+emmcache                      = 1,1,31,0
+emu_auproviders               = 0E00:000000
+
+[reader]
 label                         = emulator
 enable                        = 0
 protocol                      = emu

@@ -1,0 +1,27 @@
+From a4ddc398caeedd5b5119502a24e864b173b2e254 Mon Sep 17 00:00:00 2001
+From: Memphiz <memphis@machzwo.de>
+Date: Sun, 25 Jan 2015 16:50:34 +0100
+Subject: [PATCH] [amvideocap] - fixed typo in src rect of amvideocap
+
+---
+ drivers/amlogic/amports/amvideocap.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+ mode change 100644 => 100755 drivers/amlogic/amports/amvideocap.c
+
+diff --git a/drivers/amlogic/amports/amvideocap.c b/drivers/amlogic/amports/amvideocap.c
+old mode 100644
+new mode 100755
+index 5ac6c7c1b41..14cfa09da86
+--- a/drivers/amlogic/amports/amvideocap.c
++++ b/drivers/amlogic/amports/amvideocap.c
+@@ -545,8 +545,8 @@ static ssize_t amvideocap_YUV_to_RGB(
+ 	ge2d_config.src_para.x_rev = 0;
+ 	ge2d_config.src_para.y_rev = 0;
+ 	ge2d_config.src_para.color = 0;
+-	ge2d_config.src_para.top = input_x;
+-	ge2d_config.src_para.left = input_y;
++	ge2d_config.src_para.left = input_x;
++	ge2d_config.src_para.top = input_y;
+ 	ge2d_config.src_para.width = input_width;
+ 	ge2d_config.src_para.height = input_height;
+ 

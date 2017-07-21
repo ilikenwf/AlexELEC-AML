@@ -260,7 +260,7 @@ static int avl6862_setup_pll(struct avl6862_priv *priv)
 }
 
 
-#define DEMOD_WAIT_RETRIES	(100)
+#define DEMOD_WAIT_RETRIES	(10)
 #define DEMOD_WAIT_MS		(20)
 static int avl6862_wait_demod(struct avl6862_priv *priv)
 {
@@ -284,11 +284,10 @@ static int avl6862_wait_demod(struct avl6862_priv *priv)
 static int avl6862_exec_n_wait(struct avl6862_priv *priv, u8 cmd)
 {
 	int ret;
-/*
+
 	ret = avl6862_wait_demod(priv);
 	if (ret)
 		return ret;
-*/
 	ret = avl6862_WR_REG16(priv, 0x200 + rc_fw_command_saddr_offset, (u32) cmd);
 	if (ret)
 		return ret;
@@ -511,7 +510,7 @@ static int avl6862_patch_demod(struct avl6862_priv *priv, u32 *patch)
 	return ret;
 }
 
-#define DEMOD_WAIT_RETRIES_BOOT	(10)
+#define DEMOD_WAIT_RETRIES_BOOT	(100)
 #define DEMOD_WAIT_MS_BOOT	(20)
 static int avl6862_wait_demod_boot(struct avl6862_priv *priv)
 {
@@ -1367,6 +1366,7 @@ static int avl6862_read_status(struct dvb_frontend *fe, enum fe_status *status)
 		if (reg) {
 			ret |= avl6862_RD_REG16(priv,0x400 + rs_DVBC_snr_dB_x100_saddr_offset, &snr);		  
 			if (ret) snr = 0;
+			*status = FE_HAS_SIGNAL;
 		}
 		mul = 131;
 		break;
@@ -1376,6 +1376,7 @@ static int avl6862_read_status(struct dvb_frontend *fe, enum fe_status *status)
 		if (reg) {
 			ret |= avl6862_RD_REG32(priv,0xc00 + rs_DVBSx_int_SNR_dB_iaddr_offset, &snr);		  
 			if (ret || snr > 10000) snr = 0;
+			*status = FE_HAS_SIGNAL;
 		} else { 
 			*status = 0;
 			return ret;
@@ -1386,6 +1387,10 @@ static int avl6862_read_status(struct dvb_frontend *fe, enum fe_status *status)
 	case SYS_DVBT2:
 		ret |= avl6862_RD_REG8(priv, 0x800 + rs_DVBTx_fec_lock_caddr_offset, &reg);
 		if (reg) {
+			u32 nosig = 0;
+			ret |= avl6862_RD_REG16(priv,0x800 + rs_DVBTx_Signal_Presence_iaddr_offset, &nosig);
+			if (nosig != 0)
+				*status = FE_HAS_SIGNAL;
 			ret |= avl6862_RD_REG16(priv,0x800 + rs_DVBTx_snr_dB_x100_saddr_offset, &snr);		  
 			if (ret) snr = 0;
 		}
@@ -1400,7 +1405,6 @@ static int avl6862_read_status(struct dvb_frontend *fe, enum fe_status *status)
 	  	*status = 0;
 		return ret;
 	}
-	*status = FE_HAS_SIGNAL;
 	ret = avl6862_RD_REG16(priv,0x0a4 + rs_rf_agc_saddr_offset, &agc);
 
 	c->strength.len = 2;
